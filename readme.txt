@@ -4,7 +4,7 @@ Tags: seo, meta-description, title, rank-math, ai
 Requires at least: 5.8
 Tested up to: 6.8.3
 Requires PHP: 7.4
-Stable tag: 1.0.8
+Stable tag: 1.0.9
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -117,18 +117,26 @@ Removing the plugin deletes its settings and only the score meta it created:
 - `aissp_bulk_endpoint( $url )`
 
 == Changelog ==
-= 1.0.0 =
-* First public release.
 
-== Upgrade Notice ==
-= 1.0.0 =
-Initial release.
-
-= 1.0.6 =
-- Fixed plugin header and version constant.
-- Updated Description/Privacy.
-
-== Changelog ==
+= 1.0.9 =
+* Cleanup: removed custom “View details” row-meta link.
+* Marked as “Tested up to: 6.8.3”.
+* Minor internal tidy-ups.
 
 = 1.0.8 =
-- Row-meta cleanup and small internal refactor.
+* Row-meta cleanup and small internal refactor.
+
+= 1.0.0 =
+* First public release.
+== Changelog ==
+
+= 1.0.9 =
+* Cleanup: removed custom “View details” row-meta link.
+* Marked as “Tested up to: 6.8.3”.
+* Minor internal tidy-ups.
+
+= 1.0.8 =
+* Row-meta cleanup and small internal refactor.
+
+= 1.0.0 =
+* First public release.
