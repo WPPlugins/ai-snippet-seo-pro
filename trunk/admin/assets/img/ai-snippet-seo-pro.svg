@@ -1,0 +1,9 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="20" height="20">
+	<title>Yeni Proje</title>
+	<defs>
+		<image  width="39" height="38" id="img1" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACcAAAAmCAMAAABwIXKiAAAAAXNSR0IB2cksfwAAAG9QTFRFAAAA////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////L9MC0QAAACV0Uk5TAPf//r4X+QHBBQDT59QD7/WGj+Ub9O4iRA38/QoE7ej7CwIMQG/DBTYAAADcSURBVHiczdRtC4JADADgW2pgiYS96Yfe6P//oyAqeyGUyIqUUtsuKALvzj5EDmSCD9vOgwHDAGCygBQfzHomZRgZOTVDCKxGWYM7JeMmcHUwE6yoMxa/UvGM6Myc3uIG738tPhOv10yZfn7WM07iesyGhPdrXayDpG+Z+Mo5gRx1Q3J0LYroBT9x/SyUICv6uxNcKg89+tl/cfcF7drbyriy5yjrPNgVfvbAr4Y7CuZ3Pp1AvQPdYJ3nSjf0aa+5GwUbrWhPjpfyzpMFGnTTuaptx57xbafJJ6S5HvRXjI8WlUdpAAAAAElFTkSuQmCC"/>
+	</defs>
+	<style>
+	</style>
+	<use id="Katman 1" href="#img1" x="0" y="1"/>
+</svg>
