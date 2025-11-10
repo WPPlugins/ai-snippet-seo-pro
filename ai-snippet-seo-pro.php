@@ -2,9 +2,7 @@
 /*
 Plugin Name: AI Snippet SEO Pro
 Description: One-click AI SEO titles & meta descriptions with scoring, live preview, and bulk actions for posts & taxonomies.
-Version: 1.0.5
- * License: GPLv2 or later
- * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+Version:     1.0.6
 Author:      RankPilotAI
 Author URI:  https://rankpilotai.com
 Text Domain: ai-snippet-seo-pro
@@ -20,6 +18,8 @@ if ( ! defined('ABSPATH') ) exit;
 define('AISSP_FILE', __FILE__);
 define('AISSP_RP_API', 'https://rankpilotai.com/wp-json/rankpilotai/v1');
 
+/* Version constant — basit ve PHP5 uyumlu */
+if ( ! defined('AISSP_VERSION') ) { define('AISSP_VERSION','1.0.6'); }
 function aissp_plugin_activate() {
     $option_key = 'aissp_settings';
     $opts = get_option($option_key,[]);
