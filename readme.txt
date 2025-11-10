@@ -4,7 +4,7 @@ Tags: seo, meta-description, title, rank-math, ai
 Requires at least: 5.8
 Tested up to: 6.8.3
 Requires PHP: 7.4
-Stable tag: 1.0.9
+Stable tag: 1.0.10
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -140,3 +140,7 @@ Removing the plugin deletes its settings and only the score meta it created:
 
 = 1.0.0 =
 * First public release.
+
+= 1.0.10 =
+- Marked as tested up to 6.8.3.
+- FAQ: Rank Math usage and preventing overrides.
