@@ -2,7 +2,7 @@
 /*
 Plugin Name: AI Snippet SEO Pro
 Description: One-click AI SEO titles & meta descriptions with scoring, live preview, and bulk actions for posts & taxonomies.
-Version:     1.0.6
+Version: 1.0.7
 Author:      RankPilotAI
 Author URI:  https://rankpilotai.com
 Text Domain: ai-snippet-seo-pro
@@ -19,7 +19,7 @@ define('AISSP_FILE', __FILE__);
 define('AISSP_RP_API', 'https://rankpilotai.com/wp-json/rankpilotai/v1');
 
 /* Version constant — basit ve PHP5 uyumlu */
-if ( ! defined('AISSP_VERSION') ) { define('AISSP_VERSION','1.0.6'); }
+if ( ! defined('AISSP_VERSION') ) { if ( ! defined('AISSP_VERSION') ) if ( ! defined('AISSP_VERSION') ) define('AISSP_VERSION','1.0.7'); }
 function aissp_plugin_activate() {
     $option_key = 'aissp_settings';
     $opts = get_option($option_key,[]);
@@ -49,7 +49,7 @@ final class AI_Snippet_SEO_Pro {
     }
 
     private function define_constants(){
-        define('AISSP_VERSION','1.0.0');
+        if ( ! defined('AISSP_VERSION') ) if ( ! defined('AISSP_VERSION') ) define('AISSP_VERSION','1.0.7');
         define('AISSP_PATH', plugin_dir_path(__FILE__));
         define('AISSP_URL', plugin_dir_url(__FILE__));
         define('AISSP_SETTINGS_SLUG','aissp_settings');
@@ -638,13 +638,3 @@ function aissp(){
     return AI_Snippet_SEO_Pro::get_instance();
 }
 aissp();
-
-/**
- * Add custom "View details" link in plugin row until WP.org page is live
- */
-add_filter('plugin_row_meta', function($links, $file){
-    if ($file === plugin_basename(__FILE__)) {
-        $links[] = '<a href="https://rankpilotai.com/ai-snippet-seo-pro/" target="_blank" rel="noopener">View details</a>';
-    }
-    return $links;
-}, 10, 2);
