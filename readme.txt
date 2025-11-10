@@ -4,7 +4,7 @@ Tags: ai, seo, title, meta, meta description
 Requires at least: 5.8
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -123,3 +123,6 @@ Initial release.
 3. Live preview and scoring
 4. Taxonomy edit screen integration
 5. Settings page overview
+
+= 1.0.1 =
+- Readme improvements and minor tweaks.
