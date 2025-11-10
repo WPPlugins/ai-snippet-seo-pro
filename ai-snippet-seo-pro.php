@@ -2,7 +2,7 @@
 /*
 Plugin Name: AI Snippet SEO Pro
 Description: One-click AI SEO titles & meta descriptions with scoring, live preview, and bulk actions for posts & taxonomies.
-Version: 1.0.14
+Version: 1.0.15
 Author:      RankPilotAI
 Author URI:  https://rankpilotai.com
 Text Domain: ai-snippet-seo-pro
@@ -638,3 +638,4 @@ function aissp(){
     return AI_Snippet_SEO_Pro::get_instance();
 }
 aissp();
+
