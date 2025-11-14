@@ -4,17 +4,11 @@ if (!defined('ABSPATH')) exit;
 /**
  * RankPilot JSON HTTP helper for AI Snippet SEO Pro
  *
- * @file      rp-http.php
- * @package   RankPilotAI\AI_Snippet_SEO_Pro\Http
- * @since     1.0.0
- * @version   1.0.0
- * @license   GPL-2.0-or-later
- *
- * Features
- * - Uses WordPress HTTP API with JSON headers & UA.
- * - One-time insecure retry (sslverify=false) for cURL error 60 / SSL certificate issues.
- * - Short backoff + single retry for 429/5xx and common transient network errors.
- * - Fully filterable request args & retry behavior (developer friendly).
+ * Güvenli ama gerektiğinde toleranslı HTTP katmanı:
+ * - WP HTTP API kullanır
+ * - 429/5xx için kısa backoff + tek retry
+ * - SSL/cert hatalarında (cURL 60 vs.) tek seferlik sslverify=false fallback (filtre ile kapatılabilir)
+ * - Timeout / DNS gibi transient network hatalarına tek retry
  */
 function aissp_http_json(string $url, array $payload = [], string $method = 'POST', array $extra = []) {
     $base = [
@@ -39,46 +33,69 @@ function aissp_http_json(string $url, array $payload = [], string $method = 'POS
 
     /** Retry list & attempts. */
     $retryCodes = apply_filters('aissp_http_retry_codes', [429, 500, 502, 503, 504, 520, 521, 522]);
-    $maxRetries = (int) apply_filters('aissp_http_retries', 1); // 1 = one extra attempt
+    $maxRetries = (int) apply_filters('aissp_http_retries', 1); // 1 = bir ekstra deneme
 
     $triedInsecure = false;
-    $attempt = 0;
-    $res = null;
+    $attempt       = 0;
+    $res           = null;
 
     while (true) {
         $res = $do($url, $args);
 
-        if (!is_wp_error($res)) {
+        /* ---------------- Normal HTTP cevabı ---------------- */
+        if ( ! is_wp_error($res) ) {
             $code = (int) wp_remote_retrieve_response_code($res);
-            if (!in_array($code, $retryCodes, true)) {
-                // Success or a non-retryable response code.
+
+            // 2xx / 3xx / 4xx ama retry listesinde değil → döngü biter
+            if ( ! in_array($code, $retryCodes, true) ) {
                 break;
             }
-            if ($attempt >= $maxRetries) break; // No more retries allowed.
-            usleep(200000 * ($attempt + 1));    // Backoff: 0.2s, 0.4s
+
+            // 429 / 5xx için sınırlı retry
+            if ( $attempt >= $maxRetries ) {
+                break;
+            }
+
             $attempt++;
+            usleep(200000 * $attempt); // 0.2s, 0.4s
             continue;
         }
 
-        // WP_Error — stop on SSL or network failure (no insecure retry)
-$msg = implode('; ', $res->get_error_messages());
-if (is_wp_error($res)) {
-    break;
-}
+        /* ---------------- WP_Error cevabı ---------------- */
+        $msg = implode('; ', $res->get_error_messages());
 
-        // Timeout / DNS / cURL 28 and other transient errors
-        $transientErr = (stripos($msg, 'timed out') !== false)
-                     || (stripos($msg, 'cURL error 28') !== false)
-                     || (stripos($msg, 'Could not resolve') !== false)
-                     || (stripos($msg, 'cURL error 6') !== false);
+        // 1) SSL / sertifika problemi → tek seferlik insecure retry (opsiyonel)
+        $isCertErr = ( stripos($msg, 'certificate') !== false )
+                  || ( stripos($msg, 'SSL') !== false )
+                  || ( stripos($msg, 'cURL error 60') !== false );
 
-        if ($transientErr && $attempt < $maxRetries) {
-            usleep(200000 * ($attempt + 1));
+        if (
+            $isCertErr
+            && ! $triedInsecure
+            && apply_filters('aissp_http_allow_insecure_retry', true, $res, $url, $args)
+        ) {
+            $triedInsecure           = true;
+            $args['sslverify']       = false;
+            unset($args['sslcertificates']);
+
             $attempt++;
+            usleep(200000 * $attempt);
             continue;
         }
 
-        // Persistent failure — give up.
+        // 2) Timeout / DNS / cURL 28/6 gibi transient hatalar
+        $transientErr = ( stripos($msg, 'timed out') !== false )
+                     || ( stripos($msg, 'cURL error 28') !== false )
+                     || ( stripos($msg, 'Could not resolve') !== false )
+                     || ( stripos($msg, 'cURL error 6') !== false );
+
+        if ( $transientErr && $attempt < $maxRetries ) {
+            $attempt++;
+            usleep(200000 * $attempt);
+            continue;
+        }
+
+        // 3) Kalıcı WP_Error → vazgeç
         break;
     }
 

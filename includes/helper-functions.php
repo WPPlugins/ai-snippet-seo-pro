@@ -180,7 +180,9 @@ function aissp_call_rankpilot_api( $site_token, $payload ) {
  * @return array Token status data (ensures 'allowed_models' exists) or ['error'=>...].
  */
 function aissp_check_token_status( $site_token ) {
-    if ( empty( $site_token ) ) { return [ 'error' => 'No token provided' ]; }
+    if ( empty( $site_token ) ) {
+        return [ 'error' => 'No token provided' ];
+    }
 
     $body = [
         'site_token' => $site_token,
@@ -200,9 +202,43 @@ function aissp_check_token_status( $site_token ) {
         [ 'timeout' => 20, 'headers' => [ 'Cache-Control' => 'no-cache' ] ]
     );
 
-    if ( is_wp_error( $res ) ) { return [ 'error' => 'Connection Error' ]; }
-    $data = json_decode( wp_remote_retrieve_body( $res ), true );
-    if ( empty( $data['allowed_models'] ) ) { $data['allowed_models'] = [ 'gpt-4-turbo' ]; }
+    // 1) WP_Error → gerçek mesajı geri döndür (debug için çok daha faydalı)
+    if ( is_wp_error( $res ) ) {
+        $msg = implode( '; ', $res->get_error_messages() );
+        if ( ! $msg ) {
+            $msg = 'Connection Error';
+        }
+        return [ 'error' => $msg ];
+    }
+
+    $code = (int) wp_remote_retrieve_response_code( $res );
+    $body = wp_remote_retrieve_body( $res );
+    $data = json_decode( $body, true );
+
+    // 2) HTTP 200 dışı status → mümkünse API'nin kendi error mesajını göster
+    if ( $code !== 200 ) {
+        if ( is_array( $data ) && ! empty( $data['error'] ) ) {
+            return [
+                'error'     => (string) $data['error'],
+                'http_code' => $code,
+            ];
+        }
+
+        return [
+            'error'     => 'HTTP ' . $code,
+            'http_code' => $code,
+        ];
+    }
+
+    // 3) JSON parse edilemediyse
+    if ( ! is_array( $data ) ) {
+        return [ 'error' => 'Invalid JSON response from rankpilotai.com' ];
+    }
+
+    if ( empty( $data['allowed_models'] ) ) {
+        $data['allowed_models'] = [ 'gpt-4-turbo' ];
+    }
+
     return $data;
 }
 
