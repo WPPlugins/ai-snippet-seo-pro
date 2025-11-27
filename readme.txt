@@ -4,11 +4,11 @@ Tags: seo, meta-description, title, rank-math, ai
 Requires at least: 5.8
 Tested up to: 6.8.3
 Requires PHP: 7.4
-Stable tag: 1.0.19
+Stable tag: 1.0.20
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-One-click AI SEO titles & meta descriptions with scoring, live preview, and bulk actions for posts & taxonomies.
+Generate AI SEO titles and meta descriptions in one click, with scoring, live preview and bulk tools for posts and taxonomies.
 
 == Description ==
 Generate SEO-friendly titles and meta descriptions with one click. The plugin scores each snippet (0–100), checks keyword usage, shows live preview, and supports bulk actions for posts and taxonomies.
@@ -118,29 +118,21 @@ Removing the plugin deletes its settings and only the score meta it created:
 
 == Changelog ==
 
-= 1.0.9 =
-* Cleanup: removed custom “View details” row-meta link.
-* Marked as “Tested up to: 6.8.3”.
-* Minor internal tidy-ups.
-
-= 1.0.8 =
-* Row-meta cleanup and small internal refactor.
-
-= 1.0.0 =
-* First public release.
-== Changelog ==
-
-= 1.0.9 =
-* Cleanup: removed custom “View details” row-meta link.
-* Marked as “Tested up to: 6.8.3”.
-* Minor internal tidy-ups.
-
-= 1.0.8 =
-* Row-meta cleanup and small internal refactor.
-
-= 1.0.0 =
-* First public release.
+= 1.0.20 =
+* Tweak: Updated short description and plugin listing copy. No functional changes.
 
 = 1.0.10 =
-- Marked as tested up to 6.8.3.
-- FAQ: Rank Math usage and preventing overrides.
+* Marked as tested up to 6.8.3.
+* FAQ: clarified Rank Math usage and how to prevent overrides.
+
+= 1.0.9 =
+* Cleanup: removed custom "View details" row-meta link.
+* Marked as tested up to 6.8.3.
+* Minor internal tidy-ups.
+
+= 1.0.8 =
+* Row-meta cleanup and small internal refactor.
+
+= 1.0.0 =
+* First public release.
+
