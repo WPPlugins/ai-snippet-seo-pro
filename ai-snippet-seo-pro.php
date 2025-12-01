@@ -2,7 +2,7 @@
 /*
 Plugin Name: AI Snippet SEO Pro
 Description: Generate AI SEO titles and meta descriptions in one click, with scoring, live preview and bulk tools for posts and taxonomies.
-Version: 1.0.20
+Version: 1.0.21
 Author:      RankPilotAI
 Author URI:  https://rankpilotai.com
 Text Domain: ai-snippet-seo-pro
@@ -19,15 +19,19 @@ define('AISSP_FILE', __FILE__);
 define('AISSP_RP_API', 'https://rankpilotai.com/wp-json/rankpilotai/v1');
 
 /* Version constant — basit ve PHP5 uyumlu */
-if ( ! defined('AISSP_VERSION') ) { if ( ! defined('AISSP_VERSION') ) if ( ! defined('AISSP_VERSION') ) if ( ! defined('AISSP_VERSION') ) define('AISSP_VERSION','1.0.20'); }
+if ( ! defined('AISSP_VERSION') ) { if ( ! defined('AISSP_VERSION') ) if ( ! defined('AISSP_VERSION') ) if ( ! defined('AISSP_VERSION') ) define('AISSP_VERSION','1.0.21'); }
 function aissp_plugin_activate() {
     $option_key = 'aissp_settings';
-    $opts = get_option($option_key,[]);
-    if(!is_array($opts)) $opts=[];
-    if(empty($opts['site_token'])){
-        $opts['site_token'] = 'rp_'.wp_generate_password(20,false,false);
-        update_option($option_key,$opts);
+    $opts = get_option($option_key, []);
+    if ( ! is_array($opts) ) {
+        $opts = [];
     }
+
+    if ( ! array_key_exists('site_token', $opts) ) {
+        $opts['site_token'] = '';
+    }
+
+    update_option($option_key, $opts);
 }
 register_activation_hook(__FILE__,'aissp_plugin_activate');
 
@@ -49,7 +53,7 @@ final class AI_Snippet_SEO_Pro {
     }
 
     private function define_constants(){
-        if ( ! defined('AISSP_VERSION') ) if ( ! defined('AISSP_VERSION') ) if ( ! defined('AISSP_VERSION') ) define('AISSP_VERSION','1.0.9');
+        if ( ! defined('AISSP_VERSION') ) if ( ! defined('AISSP_VERSION') ) if ( ! defined('AISSP_VERSION') ) define('AISSP_VERSION','1.0.21');
         define('AISSP_PATH', plugin_dir_path(__FILE__));
         define('AISSP_URL', plugin_dir_url(__FILE__));
         define('AISSP_SETTINGS_SLUG','aissp_settings');
