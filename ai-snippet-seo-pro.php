@@ -2,12 +2,13 @@
 /*
 Plugin Name: AI Snippet SEO Pro
 Description: Generate AI SEO titles and meta descriptions in one click, with scoring, live preview and bulk tools for posts and taxonomies.
-Version: 1.0.21
+Version: 1.0.22
 Author:      RankPilotAI
 Author URI:  https://rankpilotai.com
 Text Domain: ai-snippet-seo-pro
 Domain Path: /languages
 Requires at least: 5.8
+Tested up to:      6.9
 Requires PHP:      7.4
 License:           GPLv2 or later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
@@ -19,7 +20,7 @@ define('AISSP_FILE', __FILE__);
 define('AISSP_RP_API', 'https://rankpilotai.com/wp-json/rankpilotai/v1');
 
 /* Version constant — basit ve PHP5 uyumlu */
-if ( ! defined('AISSP_VERSION') ) { if ( ! defined('AISSP_VERSION') ) if ( ! defined('AISSP_VERSION') ) if ( ! defined('AISSP_VERSION') ) define('AISSP_VERSION','1.0.21'); }
+if ( ! defined('AISSP_VERSION') ) { if ( ! defined('AISSP_VERSION') ) if ( ! defined('AISSP_VERSION') ) if ( ! defined('AISSP_VERSION') ) define('AISSP_VERSION','1.0.22'); }
 function aissp_plugin_activate() {
     $option_key = 'aissp_settings';
     $opts = get_option($option_key, []);

@@ -4,7 +4,7 @@ Tags: seo, meta-description, title, rank-math, ai
 Requires at least: 5.8
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.0.21
+Stable tag: 1.0.22
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -117,6 +117,10 @@ Removing the plugin deletes its settings and only the score meta it created:
 - `aissp_bulk_endpoint( $url )`
 
 == Changelog ==
+
+= 1.0.22 =
+* Maintenance: version consistency updates and minor documentation/copy cleanup. No functional changes.
+
 = 1.0.21 =
 * New installs start with an empty Site Key field instead of a random generated key.
 
