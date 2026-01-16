@@ -2,7 +2,7 @@
 /*
 Plugin Name: AI Snippet SEO Pro
 Description: Generate AI SEO titles and meta descriptions in one click, with scoring, live preview and bulk tools for posts and taxonomies.
-Version: 1.0.23
+Version: 1.0.24
 Author:      RankPilotAI
 Author URI:  https://rankpilotai.com
 Text Domain: ai-snippet-seo-pro
@@ -20,7 +20,7 @@ define('AISSP_FILE', __FILE__);
 define('AISSP_RP_API', 'https://rankpilotai.com/wp-json/rankpilotai/v1');
 
 /* Version constant — basit ve PHP5 uyumlu */
-if ( ! defined('AISSP_VERSION') ) { if ( ! defined('AISSP_VERSION') ) if ( ! defined('AISSP_VERSION') ) if ( ! defined('AISSP_VERSION') ) define('AISSP_VERSION','1.0.23'); }
+if ( ! defined('AISSP_VERSION') ) { if ( ! defined('AISSP_VERSION') ) if ( ! defined('AISSP_VERSION') ) if ( ! defined('AISSP_VERSION') ) define('AISSP_VERSION','1.0.24'); }
 function aissp_plugin_activate() {
     $option_key = 'aissp_settings';
     $opts = get_option($option_key, []);
@@ -54,7 +54,7 @@ final class AI_Snippet_SEO_Pro {
     }
 
     private function define_constants(){
-        if ( ! defined('AISSP_VERSION') ) if ( ! defined('AISSP_VERSION') ) if ( ! defined('AISSP_VERSION') ) define('AISSP_VERSION','1.0.21');
+        if ( ! defined('AISSP_VERSION') ) if ( ! defined('AISSP_VERSION') ) if ( ! defined('AISSP_VERSION') ) define('AISSP_VERSION','1.0.24');
         define('AISSP_PATH', plugin_dir_path(__FILE__));
         define('AISSP_URL', plugin_dir_url(__FILE__));
         define('AISSP_SETTINGS_SLUG','aissp_settings');
