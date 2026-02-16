@@ -158,6 +158,24 @@ jQuery(document).ready(function ($) {
 	updateAll();
 
 	/* =========================================================
+	 * Token info: on initial panel load
+	 * ======================================================= */
+	if (typeof AISSP_Ajax !== 'undefined' && AISSP_Ajax.site_token) {
+		fetch(AISSP_Ajax.rest_url + '/token-info', {
+			method : 'POST',
+			headers: { 'Content-Type':'application/json' },
+			body   : JSON.stringify({
+				site_token : AISSP_Ajax.site_token,
+				plugin     : 'ai-snippet-seo-pro',
+				site_url   : AISSP_Ajax.site_url
+			})
+		})
+		.then(r => r.json())
+		.then(console.log)
+		.catch(console.error);
+	}
+
+	/* =========================================================
 	 * Generate snippet via AI + token-reduce
 	 * ======================================================= */
 	$('#aissp-generate-ai').on('click', function (e) {

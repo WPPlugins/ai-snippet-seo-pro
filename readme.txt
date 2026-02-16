@@ -1,123 +1,109 @@
-=== AI Snippet SEO Pro – AI Meta Description & SEO Title Generator ===
+=== AI Snippet SEO Pro ===
 Contributors: rankpilotai
-Tags: meta description, seo title, ai seo, ai, seo
+Tags: seo, meta-description, title, rank-math, ai
 Requires at least: 5.8
-Tested up to: 7.1
+Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.0.35
+Stable tag: 1.0.25
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-AI SEO title and meta description generator for posts, pages, products and categories, with snippet score, live preview and bulk generation.
+Generate AI SEO titles and meta descriptions in one click, with scoring, live preview and bulk tools for posts and taxonomies.
 
 == Description ==
+Generate SEO-friendly titles and meta descriptions with one click. The plugin scores each snippet (0–100), checks keyword usage, shows live preview, and supports bulk actions for posts and taxonomies.
 
-AI Snippet SEO Pro writes SEO titles, meta descriptions, focus keywords and slugs for posts, pages, WooCommerce products, custom post types and category or tag archives. It outputs the meta tags itself, so it works on its own without a separate SEO plugin.
+= Highlights =
+* One-click AI generation (post and taxonomy editors)
+* Live preview and checklist (title length, meta length, keyword in slug)
+* Bulk generate from list tables (posts and terms)
+* Optional auto-slug update (adds _wp_old_slug for 301)
+* Token-based usage via RankPilotAI (free tier available)
 
-Writing a unique title and meta description for every page is the SEO task most sites skip. Without one, Google pulls a snippet from the page text, which rarely makes the best case for the click. Snippet SEO Pro writes a search-ready title and description from your content in seconds, scores it from 0 to 100, shows a live search preview, and can generate snippets for many posts or terms at once straight from the list screens (Pro).
+= How it works =
+1. Go to **AI Snippet SEO Pro → Settings** and add your **Site Key**.
+2. Choose a model and whether to enable **auto-slug**.
+3. Open any post or term, click **Generate with AI**.
+4. Review the score and checklist, then **Save**.
 
-**Three ways to use:**
+= External services =
+This plugin connects to RankPilotAI to generate SEO suggestions.
+* Base URL: https://rankpilotai.com
+* Endpoints:
+  * /wp-json/rankpilotai/v1/snippet
+  * /wp-json/rankpilotai/v1/token-info
 
-1. **Free Trial** - Start instantly with 25 free tokens, no registration or API key needed.
-2. **Bring Your Own Key (BYOK)** - Use your own OpenAI API key for unlimited single generations at no cost.
-3. **Pro** - Upgrade for bulk generation, auto-slug, all AI models, custom prompts, index/noindex control, and priority support. Plans start at $4.79/month, billed yearly. [See pricing](https://rankpilotai.com/ai-snippet-seo-pro-pricing/)
+= Privacy =
+No analytics or tracking. Only the fields required to generate snippets are sent to RankPilotAI.
 
-**Highlights**
-
-- One-click AI generation in the post and term editor
-- Live preview, score badge (0-100), and snippet checklist
-- Standalone SEO meta output (title, description, keywords tags in head)
-- Index / Noindex control per content type (Pro)
-- Bulk generate from list tables for posts and terms (Pro)
-- Optional **Auto-Slug** update (WordPress keeps a 301 via `_wp_old_slug`)
-- Model selection based on plan (GPT-4 Turbo / GPT-4.1 / GPT-4o)
-- Works with custom post types and WooCommerce taxonomies
-
-**Ratings**
-
-If you enjoy using AI Snippet SEO Pro, please consider leaving a review on WordPress.org.
-
+= Uninstall =
+Removes plugin options and deletes meta keys starting with `_aissp_`.
 == Installation ==
-
-1. Upload and activate **AI Snippet SEO Pro**.
-2. Go to **AI Snippet SEO Pro** in the admin menu.
-3. Choose your mode:
-   - **Free Trial** - Click "Start Free Trial" for 25 free tokens (no registration needed)
-   - **Own API Key** - Enter your OpenAI API key for unlimited single generations
-   - **Pro** - Enter your RankPilotAI Site Key for full features (bulk, auto-slug, all models)
-4. Open any post, page, or taxonomy term and click **Generate with AI Snippet SEO Pro**.
+1. Upload and activate the plugin.
+2. Go to **AI Snippet SEO Pro → Site Key Management** and paste your Site Key.
+3. (Optional) Enable **Auto-update URL Slug** and choose a model.
+4. Open a post (or term) and click **Generate with AI**.
 
 == Frequently Asked Questions ==
-
-= Do I need to register or create an account? =
-No. The free trial starts instantly with one click. For BYOK mode, just paste your OpenAI API key.
-
-= Is there a free option? =
-Yes. 25 free trial tokens are included with no registration. After that, use your own OpenAI API key for unlimited free generations, or upgrade to Pro for advanced features.
-
-= Which models are supported? =
-GPT-4.1 Mini (Trial & BYOK), plus GPT-4 Turbo, GPT-4.1, and GPT-4o in Pro mode.
-
-= What data leaves my site? =
-Only minimal context: post/term title, excerpt/description, current slug, optional focus keyword, your domain and site URL, selected model, and your Site Key. In BYOK mode, data goes directly to OpenAI and nothing is sent to RankPilotAI.
-
-= Will Auto-Slug break existing URLs? =
-When enabled, the new slug replaces the old one and WordPress stores the previous slug in `_wp_old_slug`, serving an automatic **301**.
-
-= What is the difference between Trial, BYOK and Pro? =
-- **Trial:** 25 lifetime tokens, GPT-4.1 Mini only, single generation only.
-- **BYOK:** Unlimited single generations with your own OpenAI API key, GPT-4.1 Mini.
-- **Pro:** Bulk generation, auto-slug, custom prompts, all models (GPT-4 Turbo, GPT-4.1, GPT-4o), index/noindex control, priority support, multi-site licenses.
+= Is it free? =
+A limited free tier is available. Higher tiers unlock more tokens and models.
 
 = Does it replace my SEO plugin? =
-No. You can keep your existing SEO plugin. This plugin focuses on fast, consistent AI generation and outputs its own meta tags.
+No. You can keep your existing SEO plugin for rendering tags. This plugin focuses on fast, consistent AI generation.
+
+= What data leaves my site? =
+Only what’s required to generate a snippet: post/term title, excerpt/description, current slug, optional focus keyword, your domain & site URL, selected model, and the Site Key.
+
+= Will it change my slugs? =
+Only if you enable **Auto-update URL Slug** in settings. When enabled, changes are safe by default (WordPress adds a 301 via `_wp_old_slug`).
+
+= What happens if tokens run out? =
+Generation will fail with a clear notice. You can either switch to a cheaper model (e.g., GPT-4 Turbo) or purchase more tokens.
 
 = Works with custom post types and WooCommerce? =
-Yes - any public post type, plus common taxonomies such as category, post_tag, product_cat, and product_tag.
+Yes—any public post type, plus common taxonomies such as `category`, `post_tag`, `product_cat`, and `product_tag`.
+
+== Privacy ==
+The plugin communicates with RankPilotAI endpoints to create snippets and to check/manage token usage. Data sent: title/excerpt (or term name/description), focus keyword (if provided), slug, domain, site URL, selected model, and your Site Key. Refer to rankpilotai.com for full Privacy & Terms.
+
+Endpoint used: `https://rankpilotai.com/wp-json/rankpilotai/v1/*`
 
 == External services ==
 
-This plugin connects to RankPilotAI's API to generate SEO snippets and to fetch token status.
+This plugin connects to the RankPilotAI API to generate SEO snippets and manage token usage.
 
-=== What is sent and when ===
+**Base URL:** https://rankpilotai.com/wp-json/rankpilotai/v1
 
-- **Trial mode:** Site URL is sent to RankPilotAI for registration. Post/term title, excerpt/description, slug are sent to RankPilotAI for processing.
-- **BYOK mode:** Post/term title, excerpt/description, slug are sent directly to OpenAI's API using your own API key. Nothing is sent to RankPilotAI.
-- **Pro mode:** Post/term title, excerpt/description, slug, selected model, custom prompt, site URL, domain, plugin slug, and Site Token are sent to RankPilotAI.
-- On token-status checks in the settings page (Pro mode only): Site Token, site URL and domain.
+**Endpoints used**
+- `/snippet` and `/snippet-bulk`: called when you click “Generate with AI” on posts/terms or run a bulk job.
+- `/token-info`: called when you save the Site Key or open the settings page to display current usage/limits.
+- `/token-reduce`: called after a successful generation to deduct tokens.
 
-=== Why it is sent ===
+**Data sent**
+- Site identification: `site_token`, `site_url` (domain), plugin identifier.
+- Context for generation:
+  - **Posts:** `post_title`, `post_excerpt`, `post_type`, `focus_keyword` (if set), current slug, selected model, `custom_prompt`, `auto_slug` flag.
+  - **Terms:** `term_name`, `term_slug`, `term_desc`, `focus_keyword` (if set), selected model, `custom_prompt`, `auto_slug` flag.
+- No end-user PII is intentionally sent by the plugin. Content fields are the data already stored in your WordPress site.
 
-- To generate the requested SEO snippet and return it to your editor
-- To authorize usage and show your remaining balance (Pro mode)
-- To register and track trial token usage (Trial mode)
+**Why it is sent**
+- To obtain AI-generated SEO suggestions on demand and to check your token balance.
 
-=== Endpoints ===
-
-- https://rankpilotai.com/wp-json/rankpilotai/v1/snippet (Pro)
-- https://rankpilotai.com/wp-json/rankpilotai/v1/snippet-bulk (Pro bulk)
-- https://rankpilotai.com/wp-json/rankpilotai/v1/token-info (Pro)
-- https://rankpilotai.com/wp-json/rankpilotai/v1/token-reduce (Pro)
-- https://rankpilotai.com/wp-json/rankpilotai/v1/trial-register (Trial)
-- https://rankpilotai.com/wp-json/rankpilotai/v1/trial-snippet (Trial)
-- https://api.openai.com/v1/chat/completions (BYOK - direct to OpenAI)
-
-=== Providers ===
-
-- RankPilotAI (Terms: https://rankpilotai.com/terms-and-conditions, Privacy: https://rankpilotai.com/privacy-policy)
-- OpenAI (BYOK mode only - Terms: https://openai.com/policies/terms-of-use, Privacy: https://openai.com/policies/privacy-policy)
+**Service provider**
+- RankPilotAI — Terms of Service: https://rankpilotai.com/terms/  
+- Privacy Policy: https://rankpilotai.com/privacy-policy/
 
 == Uninstall ==
 Removing the plugin deletes its settings and only the score meta it created:
-- Deletes option: `aissp_settings` (includes trial_token, openai_key)
+- Deletes option: `aissp_settings`
 - Deletes metas: `_aissp_score` on posts/terms
 - Leaves user content metas intact: `_aissp_focus_keyword`, `_aissp_seo_title`, `_aissp_seo_description`
 
 == Screenshots ==
-1. Post editor - AI generation panel with preview and checklist
-2. Settings - mode selection cards (Trial, BYOK, Pro)
-3. Settings - SEO settings and feature comparison table
-4. Bulk actions on list tables
+1. Post edit – generator & preview
+2. Score & checklist
+3. Settings – key & usage
+4. Bulk actions
 
 == Developer Notes ==
 **Meta Keys**
@@ -131,58 +117,6 @@ Removing the plugin deletes its settings and only the score meta it created:
 - `aissp_bulk_endpoint( $url )`
 
 == Changelog ==
-
-= 1.0.35 =
-* Fix: if the RankPilotAI API returns a structured error object instead of a plain string, deducting tokens after a generation no longer ends in a server error, and other API errors no longer show "Array" or raise a PHP warning. The message inside the object is shown instead.
-* Maintenance: the official Plugin Check now reports zero errors and no naming warnings. The main class keeps its public name for backward compatibility, and the reason is documented inline. The last non-English code comment was translated.
-* Compatibility: verified on WordPress 7.1.3 with PHP 8.5, including the post editor meta box, the category list and term edit screens, and the settings screen, with no PHP notices or deprecations.
-
-= 1.0.34 =
-* Hardening: if the trial API returns a structured error object instead of a string, the request no longer ends in a fatal error; the message is shown to you instead.
-* Fix: the plugin's admin script version no longer calls filemtime() on a file that may be missing.
-* Maintenance: the plugin now passes the official WordPress Plugin Check with zero errors. This covers output escaping in the meta box checklist, unslashing and sanitizing every request value, and prepared uninstall queries. Where a check does not apply, the exemption is documented inline with its reason rather than left silent.
-* Compatibility: verified on a real WordPress 7.1 install, including the post editor meta box, the term edit screens and the settings screen.
-
-= 1.0.33 =
-* SECURITY: the Pro Site Key is no longer printed into the admin page source. It was previously passed to the browser on every post, page, term and post-list screen, which exposed a paid API credential to any logged-in user who could open those screens, including Contributors.
-* SECURITY: removed a browser-side request to the RankPilotAI token endpoint that ran on every editor screen load. The response was never used, and the request sent the Site Key from the visitor's browser. Token status is still read on the settings screen, server side, exactly as the "External services" section describes.
-* Fix: the plugin's focus-ring style is now scoped to the plugin's own meta box and settings screen. It previously applied to every text field and textarea in wp-admin with !important, overriding the focus style of the editor and of other plugins.
-* Fix: the admin script version no longer calls filemtime() on a missing file, matching the guard already used for the stylesheet.
-* Maintenance: added the missing "Plugin URI" header, switched to wp_parse_url() for consistency with the rest of the codebase.
-* Compatibility: tested with WordPress 7.1.
-
-= 1.0.32 =
-* SECURITY: TLS certificate verification is no longer disabled automatically. Previously, a failed certificate check triggered a silent retry with verification turned off, which could expose the request to a man-in-the-middle. Verification now stays on; site owners with a broken local CA bundle can opt in explicitly via the `aissp_http_allow_insecure_retry` filter.
-* Improvement: removed the hardcoded CA bundle path so custom and host-provided certificate stores are respected.
-* Maintenance: remaining inline code comments translated to English.
-* Compatibility: re-verified with WordPress 7.0.
-
-= 1.0.31 =
-* Maintenance: routine housekeeping, minor code cleanup and performance tuning. No functional changes.
-* Compatibility: re-verified with WordPress 7.0.
-
-= 1.0.30 =
-* Maintenance: minor polish, code cleanup and stability improvements. No functional changes.
-* Compatibility: re-verified with WordPress 7.0.
-
-= 1.0.29 =
-* Maintenance: internal code cleanup and stability improvements. No functional changes.
-* Compatibility: re-verified with WordPress 7.0.
-
-= 1.0.28 =
-* Compatibility: tested up to WordPress 7.0.
-* Maintenance: minor housekeeping and copy cleanup. No functional changes.
-
-= 1.0.27 =
-* NEW: Three-mode system - Trial (25 free tokens), BYOK (your own OpenAI key), Pro (RankPilotAI).
-* NEW: Plugin works immediately after install with zero-friction free trial.
-* NEW: BYOK mode - unlimited single generations using your own OpenAI API key.
-* NEW: Redesigned settings page with mode selection, feature comparison table, and Pro feature indicators.
-* Bulk generation, auto-slug, custom prompt, model selection, and index/noindex are now Pro-only features.
-* Maintenance: tested with WordPress 6.9.1, minor compatibility improvements.
-
-= 1.0.26 =
-* Maintenance: tested with WordPress 6.9.1, minor compatibility improvements.
 
 = 1.0.25 =
 * UI: Modernized settings page with gradient header, card-based layout, model radio cards, usage grid, and responsive design.
@@ -203,40 +137,17 @@ Removing the plugin deletes its settings and only the score meta it created:
 * Tweak: Updated short description and plugin listing copy. No functional changes.
 
 = 1.0.10 =
-* Marked as tested up to 6.8.3. FAQ clarified.
+* Marked as tested up to 6.8.3.
+* FAQ: clarified Rank Math usage and how to prevent overrides.
 
 = 1.0.9 =
 * Cleanup: removed custom "View details" row-meta link.
+* Marked as tested up to 6.8.3.
+* Minor internal tidy-ups.
 
 = 1.0.8 =
 * Row-meta cleanup and small internal refactor.
 
 = 1.0.0 =
 * First public release.
-
-== Upgrade Notice ==
-
-= 1.0.35 =
-Maintenance release, verified against WordPress 7.1.3 and PHP 8.5. Clearer error messages when the API reports a problem. Safe to update.
-
-= 1.0.34 =
-Maintenance release, verified against WordPress 7.1. Safe to update.
-
-= 1.0.33 =
-Security update. The Pro Site Key is no longer exposed in admin page source, and an unused browser-side request that carried it has been removed. Updating is strongly recommended.
-
-= 1.0.32 =
-Security update. The plugin no longer falls back to an unverified TLS connection when a certificate check fails. Updating is recommended.
-= 1.0.29 =
-Maintenance release. Safe to update; no functional changes.
-
-= 1.0.28 =
-Compatibility update: tested up to WordPress 7.0. Minor maintenance, no functional changes.
-
-= 1.0.27 =
-Major update: Free trial (25 tokens), BYOK mode (unlimited with your own OpenAI key), redesigned settings page. Existing Pro users are not affected.
-
-= 1.0.0 =
-First public release.
-
 

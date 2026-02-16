@@ -168,12 +168,12 @@ class AISSP_Meta_Box {
 		$c5 = ( strlen( $slugVal ) > 0 && strlen( $slugVal ) <= 75 );
 		$c6 = ( $descLen >= 120 && $descLen <= 160 );
 
-		echo wp_kses_post( self::check_item( $c1, 'Focus Keyword in Title' ) );
-		echo wp_kses_post( self::check_item( $c2, 'Focus Keyword in Description' ) );
-		echo wp_kses_post( self::check_item( $c3, 'Focus Keyword in URL Slug' ) );
-		echo wp_kses_post( self::check_item( $c4, 'Title 30–60 Characters' ) );
-		echo wp_kses_post( self::check_item( $c5, 'Slug ≤ 75 Characters' ) );
-		echo wp_kses_post( self::check_item( $c6, 'Description 120–160 Characters' ) );
+		echo self::check_item( $c1, 'Focus Keyword in Title' );
+		echo self::check_item( $c2, 'Focus Keyword in Description' );
+		echo self::check_item( $c3, 'Focus Keyword in URL Slug' );
+		echo self::check_item( $c4, 'Title 30–60 Characters' );
+		echo self::check_item( $c5, 'Slug ≤ 75 Characters' );
+		echo self::check_item( $c6, 'Description 120–160 Characters' );
 		echo '</div>';
 	}
 
@@ -309,12 +309,12 @@ update_post_meta( $post_id, self::$mk_desc, $de );
 		echo '<tr class="form-field"><th><label>Snippet Checklist</label></th>
 			<td style="border:1px solid #ddd;background:#f7f7f7;padding:8px;max-width:600px;">
 			<strong style="display:block;margin-bottom:4px;border-bottom:1px solid #ddd;">Snippet Checklist</strong>';
-		echo wp_kses_post( self::check_item( $c1, 'Focus Keyword in Title' ) );
-		echo wp_kses_post( self::check_item( $c2, 'Focus Keyword in Description' ) );
-		echo wp_kses_post( self::check_item( $c3, 'Focus Keyword in URL Slug' ) );
-		echo wp_kses_post( self::check_item( $c4, 'Title 30–60 Characters' ) );
-		echo wp_kses_post( self::check_item( $c5, 'Slug ≤ 75 Characters' ) );
-		echo wp_kses_post( self::check_item( $c6, 'Description 120–160 Characters' ) );
+		echo self::check_item( $c1, 'Focus Keyword in Title' );
+		echo self::check_item( $c2, 'Focus Keyword in Description' );
+		echo self::check_item( $c3, 'Focus Keyword in URL Slug' );
+		echo self::check_item( $c4, 'Title 30–60 Characters' );
+		echo self::check_item( $c5, 'Slug ≤ 75 Characters' );
+		echo self::check_item( $c6, 'Description 120–160 Characters' );
 		echo '</td></tr>';
 	}
 	/* ---------------------------------------------------------
@@ -418,11 +418,9 @@ if ( $term_obj && ! is_wp_error( $term_obj ) ) {
 	}
 
 	public static function term_snippet_cols_sort_clauses( $clauses, $tax, $args ) {
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display parameter, no state change.
 		if ( isset( $_GET['orderby'] ) && $_GET['orderby'] === 'seo_snippet_col' ) {
 			global $wpdb;
-			// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- read-only display parameter; compared against a string literal only, and $ord itself is a hardcoded literal before it reaches the query.
-			$ord                 = ( isset( $_GET['order'] ) && strtoupper( (string) wp_unslash( $_GET['order'] ) ) === 'DESC' ) ? 'DESC' : 'ASC';
+			$ord                 = ( isset( $_GET['order'] ) && strtoupper( $_GET['order'] ) === 'DESC' ) ? 'DESC' : 'ASC';
 			$clauses['fields']  .= ", (CASE WHEN tm_score.meta_value<>'' THEN CAST(tm_score.meta_value AS UNSIGNED) ELSE 0 END) as snippet_score_val";
 			$clauses['join']    .= " LEFT JOIN {$wpdb->termmeta} tm_score ON (t.term_id=tm_score.term_id AND tm_score.meta_key='" . self::$mk_score . "')";
 			$clauses['orderby']  = " snippet_score_val $ord";
@@ -446,7 +444,6 @@ public static function generate_ai_snippet_for_post( $post_id, $return_data = fa
 
 	/* ---- usage/balance check ---- */
 	$st = aissp_check_token_status( $site_token );
-// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- delivered as JSON to admin.js and shown with alert(); never echoed as HTML.
 if ( isset( $st['error'] ) ) { throw new \Exception( 'Token check error: ' . $st['error'] ); }
 
 $__remaining_global = function_exists('aissp_status_remaining')
@@ -463,11 +460,9 @@ if ( $__remaining_global <= 0 ) {
 
 	if ( $__remaining < $__need ) {
 		throw new \Exception(
-			esc_html(
-				'Not enough tokens for the selected model (' . $model_sel . '). '
-				. 'Needs ' . $__need . ', you have ' . $__remaining . '. '
-				. 'Choose a cheaper model (e.g. GPT-4 Turbo) or buy more tokens.'
-			)
+			'Not enough tokens for the selected model (' . $model_sel . '). '
+			. 'Needs ' . $__need . ', you have ' . $__remaining . '. '
+			. 'Choose a cheaper model (e.g. GPT-4 Turbo) or buy more tokens.'
 		);
 	}
 
@@ -543,7 +538,6 @@ public static function generate_ai_snippet_for_term( $term_id ) {
 	}
 
 	$st = aissp_check_token_status( $site_token );
-// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- delivered as JSON to admin.js and shown with alert(); never echoed as HTML.
 if ( isset( $st['error'] ) ) { throw new \Exception( 'Token check error: ' . $st['error'] ); }
 
 $__remaining_global = function_exists('aissp_status_remaining')
@@ -560,11 +554,9 @@ if ( $__remaining_global <= 0 ) {
 
 	if ( $__remaining < $__need ) {
 		throw new \Exception(
-			esc_html(
-				'Not enough tokens for the selected model (' . $model_sel . '). '
-				. 'Needs ' . $__need . ', you have ' . $__remaining . '. '
-				. 'Choose a cheaper model (e.g. GPT-4 Turbo) or buy more tokens.'
-			)
+			'Not enough tokens for the selected model (' . $model_sel . '). '
+			. 'Needs ' . $__need . ', you have ' . $__remaining . '. '
+			. 'Choose a cheaper model (e.g. GPT-4 Turbo) or buy more tokens.'
 		);
 	}
 

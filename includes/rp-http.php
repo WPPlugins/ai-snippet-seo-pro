@@ -4,13 +4,11 @@ if (!defined('ABSPATH')) exit;
 /**
  * RankPilot JSON HTTP helper for AI Snippet SEO Pro
  *
- * Secure-by-default HTTP layer:
- * - Uses the WordPress HTTP API with its default CA bundle.
- * - Short backoff plus a single retry for 429/5xx responses.
- * - A single retry for transient network errors (timeout / DNS).
- * - TLS certificate verification is never disabled automatically. Site owners with a
- *   broken local CA bundle can opt in explicitly via the aissp_http_allow_insecure_retry
- *   filter, but that downgrades the connection and is not recommended.
+ * Güvenli ama gerektiğinde toleranslı HTTP katmanı:
+ * - WP HTTP API kullanır
+ * - 429/5xx için kısa backoff + tek retry
+ * - SSL/cert hatalarında (cURL 60 vs.) tek seferlik sslverify=false fallback (filtre ile kapatılabilir)
+ * - Timeout / DNS gibi transient network hatalarına tek retry
  */
 function aissp_http_json(string $url, array $payload = [], string $method = 'POST', array $extra = []) {
     $base = [
@@ -23,7 +21,7 @@ function aissp_http_json(string $url, array $payload = [], string $method = 'POS
         'timeout'         => 25,
         'httpversion'     => '1.1',
         'sslverify'       => true,
-        // No hardcoded sslcertificates path - use WP defaults so custom/host CA bundles keep working.
+        'sslcertificates' => ABSPATH . WPINC . '/certificates/ca-bundle.crt',
         'redirection'     => 2,
     ];
 
@@ -35,7 +33,7 @@ function aissp_http_json(string $url, array $payload = [], string $method = 'POS
 
     /** Retry list & attempts. */
     $retryCodes = apply_filters('aissp_http_retry_codes', [429, 500, 502, 503, 504, 520, 521, 522]);
-    $maxRetries = (int) apply_filters('aissp_http_retries', 1); // 1 = one extra attempt
+    $maxRetries = (int) apply_filters('aissp_http_retries', 1); // 1 = bir ekstra deneme
 
     $triedInsecure = false;
     $attempt       = 0;
@@ -44,16 +42,16 @@ function aissp_http_json(string $url, array $payload = [], string $method = 'POS
     while (true) {
         $res = $do($url, $args);
 
-        /* ---------------- Normal HTTP response ---------------- */
+        /* ---------------- Normal HTTP cevabı ---------------- */
         if ( ! is_wp_error($res) ) {
             $code = (int) wp_remote_retrieve_response_code($res);
 
-            // 2xx / 3xx / 4xx that is not in the retry list -> stop looping
+            // 2xx / 3xx / 4xx ama retry listesinde değil → döngü biter
             if ( ! in_array($code, $retryCodes, true) ) {
                 break;
             }
 
-            // Limited retry for 429 / 5xx
+            // 429 / 5xx için sınırlı retry
             if ( $attempt >= $maxRetries ) {
                 break;
             }
@@ -63,12 +61,10 @@ function aissp_http_json(string $url, array $payload = [], string $method = 'POS
             continue;
         }
 
-        /* ---------------- WP_Error response ---------------- */
+        /* ---------------- WP_Error cevabı ---------------- */
         $msg = implode('; ', $res->get_error_messages());
 
-        // 1) TLS / certificate problem. Verification stays ON unless the site owner
-        //    explicitly opts in, because a failed certificate check is exactly the
-        //    signal that the connection may not be trustworthy.
+        // 1) SSL / sertifika problemi → tek seferlik insecure retry (opsiyonel)
         $isCertErr = ( stripos($msg, 'certificate') !== false )
                   || ( stripos($msg, 'SSL') !== false )
                   || ( stripos($msg, 'cURL error 60') !== false );
@@ -76,7 +72,7 @@ function aissp_http_json(string $url, array $payload = [], string $method = 'POS
         if (
             $isCertErr
             && ! $triedInsecure
-            && apply_filters('aissp_http_allow_insecure_retry', false, $res, $url, $args)
+            && apply_filters('aissp_http_allow_insecure_retry', true, $res, $url, $args)
         ) {
             $triedInsecure           = true;
             $args['sslverify']       = false;
@@ -87,7 +83,7 @@ function aissp_http_json(string $url, array $payload = [], string $method = 'POS
             continue;
         }
 
-        // 2) Transient errors such as timeout / DNS / cURL 28 / cURL 6
+        // 2) Timeout / DNS / cURL 28/6 gibi transient hatalar
         $transientErr = ( stripos($msg, 'timed out') !== false )
                      || ( stripos($msg, 'cURL error 28') !== false )
                      || ( stripos($msg, 'Could not resolve') !== false )
@@ -99,7 +95,7 @@ function aissp_http_json(string $url, array $payload = [], string $method = 'POS
             continue;
         }
 
-        // 3) Permanent WP_Error -> give up
+        // 3) Kalıcı WP_Error → vazgeç
         break;
     }
 
