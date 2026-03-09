@@ -2,9 +2,9 @@
 Contributors: rankpilotai
 Tags: seo, meta-description, title, rank-math, ai
 Requires at least: 5.8
-Tested up to: 6.9
+Tested up to: 6.9.1
 Requires PHP: 7.4
-Stable tag: 1.0.25
+Stable tag: 1.0.26
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -117,6 +117,9 @@ Removing the plugin deletes its settings and only the score meta it created:
 - `aissp_bulk_endpoint( $url )`
 
 == Changelog ==
+
+= 1.0.26 =
+* Maintenance: tested with WordPress 6.9.1, minor compatibility improvements.
 
 = 1.0.25 =
 * UI: Modernized settings page with gradient header, card-based layout, model radio cards, usage grid, and responsive design.
