@@ -3,7 +3,7 @@
  * Uninstall script for AI Snippet SEO Pro
  *
  * What this removes:
- * - The main plugin option.
+ * - The main plugin option (includes trial_token, openai_key, trial_remaining).
  * - ONLY the plugin’s own score meta key (`_aissp_score`) from posts and terms.
  *
  * What this keeps (intentionally):

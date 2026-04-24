@@ -5,7 +5,7 @@
  * @file      helper-functions.php
  * @package   RankPilotAI\AI_Snippet_SEO_Pro\Helpers
  * @since     1.0.0
- * @version   1.0.0
+ * @version   1.0.27
  * @license   GPL-2.0-or-later
  *
  * Provides:
@@ -467,4 +467,85 @@ function aissp_apply_snippet_result_for_term( int $term_id, array $data, array $
 		update_term_meta( $term_id, '_aissp_score', $sc['score'] );
 	}
 	return true;
+}
+
+/* =========================================================
+ *  MODE SYSTEM (Trial / BYOK / Pro)
+ * ======================================================= */
+
+function aissp_active_mode(): string {
+	$opt = get_option( AISSP_SETTINGS_SLUG, [] );
+	if ( ! empty( $opt['site_token'] ) )  return 'pro';
+	if ( ! empty( $opt['openai_key'] ) )  return 'byok';
+	if ( ! empty( $opt['trial_token'] ) ) return 'trial';
+	return 'none';
+}
+
+function aissp_call_openai_direct( string $api_key, array $context ): array {
+	$prompt = "You are an expert SEO consultant. Generate an SEO-optimized snippet for the following content.\n\n"
+		. "Content title: " . ( $context['post_title'] ?? $context['term_name'] ?? '' ) . "\n"
+		. "Content excerpt: " . ( $context['post_excerpt'] ?? $context['term_desc'] ?? '' ) . "\n"
+		. "Current slug: " . ( $context['slug'] ?? '' ) . "\n\n"
+		. "Return a JSON object with exactly these keys:\n"
+		. "- keyword: primary focus keyword (2-4 words)\n"
+		. "- title: SEO title (30-60 chars, must contain the keyword)\n"
+		. "- description: meta description (120-160 chars, must contain the keyword)\n"
+		. "- slug: URL-friendly slug (must contain the keyword)\n\n"
+		. "Return ONLY the JSON object, no markdown, no explanation.";
+
+	$body = [
+		'model'       => 'gpt-4.1-mini',
+		'messages'    => [ [ 'role' => 'user', 'content' => $prompt ] ],
+		'max_tokens'  => 300,
+		'temperature' => 0,
+	];
+
+	$res = wp_remote_post( 'https://api.openai.com/v1/chat/completions', [
+		'headers' => [
+			'Authorization' => 'Bearer ' . $api_key,
+			'Content-Type'  => 'application/json',
+		],
+		'body'    => wp_json_encode( $body ),
+		'timeout' => 30,
+	] );
+
+	if ( is_wp_error( $res ) ) return [ 'error' => $res->get_error_message() ];
+	$code = wp_remote_retrieve_response_code( $res );
+	if ( $code === 401 ) return [ 'error' => 'Invalid OpenAI API key' ];
+	if ( $code !== 200 ) return [ 'error' => 'OpenAI API error (HTTP ' . $code . ')' ];
+
+	$json = json_decode( wp_remote_retrieve_body( $res ), true );
+	$text = trim( $json['choices'][0]['message']['content'] ?? '' );
+	if ( strpos( $text, '```' ) !== false ) {
+		$text = trim( preg_replace( '/```(?:json)?\s*|```/', '', $text ) );
+	}
+	$parsed = json_decode( $text, true );
+	return is_array( $parsed ) ? $parsed : [ 'error' => 'Failed to parse OpenAI response' ];
+}
+
+function aissp_call_trial_api( array $context ): array {
+	$opts  = get_option( AISSP_SETTINGS_SLUG, [] );
+	$token = $opts['trial_token'] ?? '';
+	if ( ! $token ) return [ 'error' => 'No trial token' ];
+
+	$payload = array_merge( $context, [
+		'trial_token' => $token,
+		'domain'      => wp_parse_url( home_url(), PHP_URL_HOST ),
+		'site_url'    => home_url(),
+		'plugin'      => 'ai-snippet-seo-pro',
+	] );
+
+	$res = wp_remote_post( AISSP_RP_API . '/trial-snippet', [
+		'headers' => [ 'Content-Type' => 'application/json' ],
+		'body'    => wp_json_encode( $payload ),
+		'timeout' => 30,
+	] );
+
+	if ( is_wp_error( $res ) ) return [ 'error' => $res->get_error_message() ];
+	$code = wp_remote_retrieve_response_code( $res );
+	$body = json_decode( wp_remote_retrieve_body( $res ), true );
+	if ( $code !== 200 || ! is_array( $body ) ) {
+		return [ 'error' => $body['error'] ?? 'Trial API error (HTTP ' . $code . ')' ];
+	}
+	return $body;
 }

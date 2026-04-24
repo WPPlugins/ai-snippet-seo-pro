@@ -2,7 +2,7 @@
 /*
 Plugin Name: AI Snippet SEO Pro
 Description: Generate AI SEO titles and meta descriptions in one click, with scoring, live preview and bulk tools for posts and taxonomies.
-Version: 1.0.26
+Version: 1.0.27
 Author:      RankPilotAI
 Author URI:  https://rankpilotai.com
 Text Domain: ai-snippet-seo-pro
@@ -19,8 +19,7 @@ if ( ! defined('ABSPATH') ) exit;
 define('AISSP_FILE', __FILE__);
 define('AISSP_RP_API', 'https://rankpilotai.com/wp-json/rankpilotai/v1');
 
-/* Version constant — basit ve PHP5 uyumlu */
-if ( ! defined('AISSP_VERSION') ) { if ( ! defined('AISSP_VERSION') ) if ( ! defined('AISSP_VERSION') ) if ( ! defined('AISSP_VERSION') ) define('AISSP_VERSION','1.0.25'); }
+if ( ! defined('AISSP_VERSION') ) { define('AISSP_VERSION','1.0.27'); }
 function aissp_plugin_activate() {
     $option_key = 'aissp_settings';
     $opts = get_option($option_key, []);
@@ -28,9 +27,10 @@ function aissp_plugin_activate() {
         $opts = [];
     }
 
-    if ( ! array_key_exists('site_token', $opts) ) {
-        $opts['site_token'] = '';
-    }
+    if ( ! array_key_exists('site_token', $opts) )      $opts['site_token'] = '';
+    if ( ! array_key_exists('trial_token', $opts) )     $opts['trial_token'] = '';
+    if ( ! array_key_exists('trial_remaining', $opts) ) $opts['trial_remaining'] = 0;
+    if ( ! array_key_exists('openai_key', $opts) )      $opts['openai_key'] = '';
 
     update_option($option_key, $opts);
 }
@@ -54,7 +54,7 @@ final class AI_Snippet_SEO_Pro {
     }
 
     private function define_constants(){
-        if ( ! defined('AISSP_VERSION') ) if ( ! defined('AISSP_VERSION') ) if ( ! defined('AISSP_VERSION') ) define('AISSP_VERSION','1.0.25');
+        if ( ! defined('AISSP_VERSION') ) define('AISSP_VERSION','1.0.27');
         define('AISSP_PATH', plugin_dir_path(__FILE__));
         define('AISSP_URL', plugin_dir_url(__FILE__));
         define('AISSP_SETTINGS_SLUG','aissp_settings');
@@ -83,6 +83,12 @@ final class AI_Snippet_SEO_Pro {
 
         // Ajax snippet generation for single post
         add_action('wp_ajax_aissp_generate_snippet',[$this,'ajax_generate_snippet']);
+
+        // Trial/BYOK AJAX handlers
+        add_action('wp_ajax_aissp_trial_register',  [$this,'ajax_trial_register']);
+        add_action('wp_ajax_aissp_save_byok_key',   [$this,'ajax_save_byok_key']);
+        add_action('wp_ajax_aissp_remove_byok_key',  [$this,'ajax_remove_byok_key']);
+        add_action('wp_ajax_aissp_remove_trial',     [$this,'ajax_remove_trial']);
 
         // Head meta tags
         add_action('wp_head',[$this,'inject_head_meta'],1);
@@ -164,8 +170,10 @@ final class AI_Snippet_SEO_Pro {
         wp_add_inline_style('aissp-admin-css', $icon_css);
 
         // Only load JS and localize data where needed.
+        $is_settings = ( $hook === 'toplevel_page_ai-snippet-seo-pro' );
         if (
-            in_array($hook, ['post.php','post-new.php','term.php','edit-tags.php','edit.php'], true)
+            $is_settings
+            || in_array($hook, ['post.php','post-new.php','term.php','edit-tags.php','edit.php'], true)
             || strpos($hook, 'ai-snippet-seo-pro') !== false
         ) {
             wp_enqueue_script(
@@ -187,6 +195,7 @@ final class AI_Snippet_SEO_Pro {
                     'rest_url'   => AISSP_RP_API,
                     'site_url'   => home_url(),
                     'model'      => $opts['model_choice'] ?? 'gpt-4-turbo',
+                    'mode'       => function_exists('aissp_active_mode') ? aissp_active_mode() : 'none',
                 ]
             );
         }
@@ -206,8 +215,33 @@ final class AI_Snippet_SEO_Pro {
             wp_send_json_error(['msg' => 'Unauthorized']);
         }
 
+        $mode = aissp_active_mode();
+        if ( $mode === 'none' ) {
+            wp_send_json_error(['msg' => 'Please configure a mode in Settings.']);
+        }
+
         try{
-            AISSP_Meta_Box::generate_ai_snippet_for_post($post_id,false);
+            $opts = get_option( AISSP_SETTINGS_SLUG, [] );
+
+            if ( $mode === 'pro' ) {
+                AISSP_Meta_Box::generate_ai_snippet_for_post($post_id,false);
+            } else {
+                $context = aissp_prepare_snippet_item_for_post( $post_id, $opts );
+                if ( $mode === 'byok' ) {
+                    $res = aissp_call_openai_direct( $opts['openai_key'], $context );
+                } else {
+                    $res = aissp_call_trial_api( $context );
+                    $remaining = $res['remaining'] ?? null;
+                    if ( $remaining !== null ) {
+                        $opts['trial_remaining'] = (int) $remaining;
+                        update_option( AISSP_SETTINGS_SLUG, $opts );
+                    }
+                }
+                if ( ! empty( $res['error'] ) ) {
+                    throw new \Exception( $res['error'] );
+                }
+                aissp_apply_snippet_result_for_post( $post_id, $res, $opts );
+            }
 
             $fw   = get_post_meta($post_id,'_aissp_focus_keyword',true);
             $ti   = get_post_meta($post_id,'_aissp_seo_title',true);
@@ -216,11 +250,9 @@ final class AI_Snippet_SEO_Pro {
 
             $sc   = aissp_calc_score($fw,$ti,$de,$slug);
             wp_send_json_success([
-                // Keep legacy keys to avoid breaking other integrations
                 'keyword' => $fw,
                 'title'   => $ti,
                 'desc'    => $de,
-                // Short keys expected by the JS
                 'kw'      => $fw,
                 'ti'      => $ti,
                 'de'      => $de,
@@ -235,6 +267,7 @@ final class AI_Snippet_SEO_Pro {
 
     // Bulk actions for terms
     public function bulk_actions_terms($actions){
+        if ( aissp_active_mode() !== 'pro' ) return $actions;
         $actions['aissp_generate_seo'] = 'Generate with AI Snippet SEO Pro';
         return $actions;
     }
@@ -453,6 +486,7 @@ final class AI_Snippet_SEO_Pro {
         add_filter('parse_query',[$this,'apply_filter_posts']);
     }
     public function bulk_actions_posts($acts){
+        if ( aissp_active_mode() !== 'pro' ) return $acts;
         $acts['aissp_generate_seo'] = 'Generate with AI Snippet SEO Pro';
         return $acts;
     }
@@ -578,6 +612,61 @@ final class AI_Snippet_SEO_Pro {
             echo '<span style="background:'.esc_attr($color).';border-radius:3px;padding:6px 9px;color:#fff;font-weight:600;font-size:12px;">'
                 .(int)$val.' / 100</span>';
         }
+    }
+
+    /* ===== Trial / BYOK AJAX handlers ===== */
+    public function ajax_trial_register(){
+        check_ajax_referer('aissp_ajax_nonce','nonce');
+        if ( ! current_user_can('manage_options') ) wp_send_json_error(['msg'=>'Unauthorized']);
+
+        $res = wp_remote_post( AISSP_RP_API . '/trial-register', [
+            'headers' => ['Content-Type'=>'application/json'],
+            'body'    => wp_json_encode([
+                'site_url' => home_url(),
+                'domain'   => wp_parse_url( home_url(), PHP_URL_HOST ),
+                'plugin'   => 'ai-snippet-seo-pro',
+            ]),
+            'timeout' => 15,
+        ]);
+        if ( is_wp_error($res) ) wp_send_json_error(['msg'=>$res->get_error_message()]);
+        $body = json_decode( wp_remote_retrieve_body($res), true );
+        if ( empty($body['trial_token']) ) wp_send_json_error(['msg'=>$body['error'] ?? 'Registration failed']);
+
+        $opts = get_option( AISSP_SETTINGS_SLUG, [] );
+        $opts['trial_token']     = sanitize_text_field( $body['trial_token'] );
+        $opts['trial_remaining'] = (int)( $body['remaining'] ?? 25 );
+        update_option( AISSP_SETTINGS_SLUG, $opts );
+        wp_send_json_success(['remaining'=>$opts['trial_remaining']]);
+    }
+
+    public function ajax_save_byok_key(){
+        check_ajax_referer('aissp_ajax_nonce','nonce');
+        if ( ! current_user_can('manage_options') ) wp_send_json_error(['msg'=>'Unauthorized']);
+        $key = sanitize_text_field( wp_unslash($_POST['openai_key'] ?? '') );
+        if ( ! $key || strpos($key,'sk-') !== 0 ) wp_send_json_error(['msg'=>'Invalid key format']);
+        $opts = get_option( AISSP_SETTINGS_SLUG, [] );
+        $opts['openai_key'] = $key;
+        update_option( AISSP_SETTINGS_SLUG, $opts );
+        wp_send_json_success();
+    }
+
+    public function ajax_remove_byok_key(){
+        check_ajax_referer('aissp_ajax_nonce','nonce');
+        if ( ! current_user_can('manage_options') ) wp_send_json_error(['msg'=>'Unauthorized']);
+        $opts = get_option( AISSP_SETTINGS_SLUG, [] );
+        $opts['openai_key'] = '';
+        update_option( AISSP_SETTINGS_SLUG, $opts );
+        wp_send_json_success();
+    }
+
+    public function ajax_remove_trial(){
+        check_ajax_referer('aissp_ajax_nonce','nonce');
+        if ( ! current_user_can('manage_options') ) wp_send_json_error(['msg'=>'Unauthorized']);
+        $opts = get_option( AISSP_SETTINGS_SLUG, [] );
+        $opts['trial_token'] = '';
+        $opts['trial_remaining'] = 0;
+        update_option( AISSP_SETTINGS_SLUG, $opts );
+        wp_send_json_success();
     }
 
     // Notices (bulk success/fail)
