@@ -1,6 +1,6 @@
 <?php
 /*  AI Snippet SEO Pro — Settings Page (Admin)
- *  Version: 1.0.27
+ *  Version: 1.0.28
  *  Three modes: Trial (25 free), BYOK (own OpenAI key), Pro (RankPilotAI)
  */
 if ( ! defined( 'ABSPATH' ) ) { exit; }

@@ -2,9 +2,9 @@
 Contributors: rankpilotai
 Tags: seo, meta-description, title, snippets, ai
 Requires at least: 5.8
-Tested up to: 6.9.1
+Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.0.27
+Stable tag: 1.0.28
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -130,6 +130,10 @@ Removing the plugin deletes its settings and only the score meta it created:
 
 == Changelog ==
 
+= 1.0.28 =
+* Compatibility: tested up to WordPress 7.0.
+* Maintenance: minor housekeeping and copy cleanup. No functional changes.
+
 = 1.0.27 =
 * NEW: Three-mode system - Trial (25 free tokens), BYOK (your own OpenAI key), Pro (RankPilotAI).
 * NEW: Plugin works immediately after install with zero-friction free trial.
@@ -172,6 +176,9 @@ Removing the plugin deletes its settings and only the score meta it created:
 * First public release.
 
 == Upgrade Notice ==
+= 1.0.28 =
+Compatibility update: tested up to WordPress 7.0. Minor maintenance, no functional changes.
+
 = 1.0.27 =
 Major update: Free trial (25 tokens), BYOK mode (unlimited with your own OpenAI key), redesigned settings page. Existing Pro users are not affected.
 

@@ -5,7 +5,7 @@
  * @file      helper-functions.php
  * @package   RankPilotAI\AI_Snippet_SEO_Pro\Helpers
  * @since     1.0.0
- * @version   1.0.27
+ * @version   1.0.28
  * @license   GPL-2.0-or-later
  *
  * Provides:
