@@ -4,7 +4,7 @@ Tags: seo, meta-description, title, snippets, ai
 Requires at least: 5.8
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.0.28
+Stable tag: 1.0.29
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -130,6 +130,10 @@ Removing the plugin deletes its settings and only the score meta it created:
 
 == Changelog ==
 
+= 1.0.29 =
+* Maintenance: internal code cleanup and stability improvements. No functional changes.
+* Compatibility: re-verified with WordPress 7.0.
+
 = 1.0.28 =
 * Compatibility: tested up to WordPress 7.0.
 * Maintenance: minor housekeeping and copy cleanup. No functional changes.
@@ -176,6 +180,9 @@ Removing the plugin deletes its settings and only the score meta it created:
 * First public release.
 
 == Upgrade Notice ==
+= 1.0.29 =
+Maintenance release. Safe to update; no functional changes.
+
 = 1.0.28 =
 Compatibility update: tested up to WordPress 7.0. Minor maintenance, no functional changes.
 
