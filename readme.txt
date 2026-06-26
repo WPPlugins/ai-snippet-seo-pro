@@ -4,7 +4,7 @@ Tags: seo, meta-description, title, snippets, ai
 Requires at least: 5.8
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.0.29
+Stable tag: 1.0.30
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -129,6 +129,10 @@ Removing the plugin deletes its settings and only the score meta it created:
 - `aissp_bulk_endpoint( $url )`
 
 == Changelog ==
+
+= 1.0.30 =
+* Maintenance: minor polish, code cleanup and stability improvements. No functional changes.
+* Compatibility: re-verified with WordPress 7.0.
 
 = 1.0.29 =
 * Maintenance: internal code cleanup and stability improvements. No functional changes.
