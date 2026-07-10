@@ -4,7 +4,7 @@ Tags: seo, meta-description, title, snippets, ai
 Requires at least: 5.8
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.0.30
+Stable tag: 1.0.31
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -130,6 +130,10 @@ Removing the plugin deletes its settings and only the score meta it created:
 
 == Changelog ==
 
+= 1.0.31 =
+* Maintenance: routine housekeeping, minor code cleanup and performance tuning. No functional changes.
+* Compatibility: re-verified with WordPress 7.0.
+
 = 1.0.30 =
 * Maintenance: minor polish, code cleanup and stability improvements. No functional changes.
 * Compatibility: re-verified with WordPress 7.0.
@@ -195,3 +199,4 @@ Major update: Free trial (25 tokens), BYOK mode (unlimited with your own OpenAI 
 
 = 1.0.0 =
 First public release.
+
