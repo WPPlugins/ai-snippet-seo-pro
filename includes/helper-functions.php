@@ -202,7 +202,7 @@ function aissp_check_token_status( $site_token ) {
         [ 'timeout' => 20, 'headers' => [ 'Cache-Control' => 'no-cache' ] ]
     );
 
-    // 1) WP_Error → gerçek mesajı geri döndür (debug için çok daha faydalı)
+    // 1) WP_Error -> return the real message (far more useful when debugging)
     if ( is_wp_error( $res ) ) {
         $msg = implode( '; ', $res->get_error_messages() );
         if ( ! $msg ) {
@@ -215,7 +215,7 @@ function aissp_check_token_status( $site_token ) {
     $body = wp_remote_retrieve_body( $res );
     $data = json_decode( $body, true );
 
-    // 2) HTTP 200 dışı status → mümkünse API'nin kendi error mesajını göster
+    // 2) Non-200 status -> surface the API's own error message when available
     if ( $code !== 200 ) {
         if ( is_array( $data ) && ! empty( $data['error'] ) ) {
             return [

@@ -4,7 +4,7 @@ Tags: seo, meta-description, title, snippets, ai
 Requires at least: 5.8
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.0.31
+Stable tag: 1.0.32
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -130,6 +130,12 @@ Removing the plugin deletes its settings and only the score meta it created:
 
 == Changelog ==
 
+= 1.0.32 =
+* SECURITY: TLS certificate verification is no longer disabled automatically. Previously, a failed certificate check triggered a silent retry with verification turned off, which could expose the request to a man-in-the-middle. Verification now stays on; site owners with a broken local CA bundle can opt in explicitly via the `aissp_http_allow_insecure_retry` filter.
+* Improvement: removed the hardcoded CA bundle path so custom and host-provided certificate stores are respected.
+* Maintenance: remaining inline code comments translated to English.
+* Compatibility: re-verified with WordPress 7.0.
+
 = 1.0.31 =
 * Maintenance: routine housekeeping, minor code cleanup and performance tuning. No functional changes.
 * Compatibility: re-verified with WordPress 7.0.
@@ -188,6 +194,9 @@ Removing the plugin deletes its settings and only the score meta it created:
 * First public release.
 
 == Upgrade Notice ==
+
+= 1.0.32 =
+Security update. The plugin no longer falls back to an unverified TLS connection when a certificate check fails. Updating is recommended.
 = 1.0.29 =
 Maintenance release. Safe to update; no functional changes.
 
@@ -199,4 +208,5 @@ Major update: Free trial (25 tokens), BYOK mode (unlimited with your own OpenAI 
 
 = 1.0.0 =
 First public release.
+
 
