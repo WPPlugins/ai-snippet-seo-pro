@@ -156,11 +156,13 @@ function aissp_call_rankpilot_api( $site_token, $payload ) {
 
     $res  = aissp_http_json( AISSP_RP_API . '/snippet', $payload, 'POST' );
     if ( is_wp_error( $res ) ) {
+        // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- delivered as JSON to admin.js and shown with alert(); never echoed as HTML.
         throw new Exception( 'API request error: ' . $res->get_error_message() );
     }
     $code = wp_remote_retrieve_response_code( $res );
     $body = wp_remote_retrieve_body( $res );
     if ( $code !== 200 ) {
+        // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- delivered as JSON to admin.js and shown with alert(); never echoed as HTML.
         throw new Exception( 'RankPilotAI API Error (HTTP ' . $code . '): ' . $body );
     }
     $json = json_decode( $body, true );
@@ -265,6 +267,7 @@ function aissp_reduce_rankpilot_token( $site_token, $model = 'gpt-4-turbo' ) {
 	$res = aissp_http_json( AISSP_RP_API . '/token-reduce', $body, 'POST', ['timeout'=>20] );
 if ( is_wp_error( $res ) ) { throw new Exception( 'RankPilotAI connection error.' ); }
 $data = json_decode( wp_remote_retrieve_body( $res ), true );
+// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- delivered as JSON to admin.js and shown with alert(); never echoed as HTML.
 if ( isset( $data['error'] ) ) { throw new Exception( $data['error'] ); }
 return $data;
 }
@@ -545,7 +548,7 @@ function aissp_call_trial_api( array $context ): array {
 	$code = wp_remote_retrieve_response_code( $res );
 	$body = json_decode( wp_remote_retrieve_body( $res ), true );
 	if ( $code !== 200 || ! is_array( $body ) ) {
-		return [ 'error' => $body['error'] ?? 'Trial API error (HTTP ' . $code . ')' ];
+		return [ 'error' => isset( $body['error'] ) && is_scalar( $body['error'] ) ? (string) $body['error'] : 'Trial API error (HTTP ' . $code . ')' ];
 	}
 	return $body;
 }

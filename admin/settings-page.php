@@ -18,7 +18,7 @@ function aissp_render_settings_page() {
 	$mode  = aissp_active_mode();
 
 	/* ───────────── FORM SUBMISSIONS ───────────── */
-	if ( isset($_POST['aissp_action']) && check_admin_referer($_POST['aissp_action']) ) {
+	if ( isset($_POST['aissp_action']) && check_admin_referer( sanitize_text_field( wp_unslash( $_POST['aissp_action'] ) ) ) ) {
 		if ( ! current_user_can('manage_options') ) wp_die('Insufficient permissions');
 
 		if ( $_POST['aissp_action'] === 'aissp_save_site_key' ) {
@@ -44,7 +44,7 @@ function aissp_render_settings_page() {
 			$opts['auto_slug']     = ( isset($_POST['auto_slug']) && $_POST['auto_slug'] === 'yes' ) ? 'yes' : 'no';
 
 			foreach ( [ 'post','page','landing_page','category','post_tag','product_cat','product_tag' ] as $k ) {
-				$raw = isset( $_POST["index_$k"] ) ? wp_unslash( $_POST["index_$k"] ) : 'no';
+				$raw = isset( $_POST["index_$k"] ) ? sanitize_text_field( wp_unslash( $_POST["index_$k"] ) ) : 'no';
 				$opts["index_$k"] = in_array( $raw, [ 'yes','no' ], true ) ? $raw : 'no';
 			}
 

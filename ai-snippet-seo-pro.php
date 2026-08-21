@@ -3,7 +3,7 @@
 Plugin Name: AI Snippet SEO Pro
 Plugin URI:  https://rankpilotai.com/
 Description: Generate AI SEO titles and meta descriptions in one click, with scoring, live preview and bulk tools for posts and taxonomies.
-Version: 1.0.33
+Version: 1.0.34
 Author:      RankPilotAI
 Author URI:  https://rankpilotai.com
 Text Domain: ai-snippet-seo-pro
@@ -20,7 +20,7 @@ if ( ! defined('ABSPATH') ) exit;
 define('AISSP_FILE', __FILE__);
 define('AISSP_RP_API', 'https://rankpilotai.com/wp-json/rankpilotai/v1');
 
-if ( ! defined('AISSP_VERSION') ) { define('AISSP_VERSION','1.0.33'); }
+if ( ! defined('AISSP_VERSION') ) { define('AISSP_VERSION','1.0.34'); }
 function aissp_plugin_activate() {
     $option_key = 'aissp_settings';
     $opts = get_option($option_key, []);
@@ -55,7 +55,7 @@ final class AI_Snippet_SEO_Pro {
     }
 
     private function define_constants(){
-        if ( ! defined('AISSP_VERSION') ) define('AISSP_VERSION','1.0.33');
+        if ( ! defined('AISSP_VERSION') ) define('AISSP_VERSION','1.0.34');
         define('AISSP_PATH', plugin_dir_path(__FILE__));
         define('AISSP_URL', plugin_dir_url(__FILE__));
         define('AISSP_SETTINGS_SLUG','aissp_settings');
@@ -339,7 +339,7 @@ final class AI_Snippet_SEO_Pro {
             wp_send_json_error(['msg'=>'Unauthorized']);
         }
 
-        $jid = sanitize_text_field($_POST['job'] ?? '');
+        $jid = sanitize_text_field(wp_unslash($_POST['job'] ?? ''));
         if ( ! $jid ) wp_send_json_error(['msg'=>'Missing job id']);
 
         $job = $this->get_job($jid);
@@ -431,7 +431,7 @@ final class AI_Snippet_SEO_Pro {
         if ( ! current_user_can('edit_posts') ) {
             wp_send_json_error(['msg'=>'Unauthorized']);
         }
-        $jid = sanitize_text_field($_POST['job'] ?? '');
+        $jid = sanitize_text_field(wp_unslash($_POST['job'] ?? ''));
         if ($jid) $this->delete_job($jid);
         wp_send_json_success();
     }
@@ -537,7 +537,8 @@ final class AI_Snippet_SEO_Pro {
     public function render_filter_posts(){
         global $pagenow;
         if($pagenow!=='edit.php') return;
-        $v=isset($_GET['aissp_filter'])?sanitize_text_field($_GET['aissp_filter']):'';
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display parameter, no state change.
+        $v=isset($_GET['aissp_filter'])?sanitize_text_field(wp_unslash($_GET['aissp_filter'])):'';
         echo '<select name="aissp_filter" style="margin-right:8px;">';
         echo '<option value="">AI Snippet SEO Pro</option>';
         echo '<option value="haskw" '.selected($v,'haskw',false).'>Has Focus Keyword</option>';
@@ -551,8 +552,10 @@ final class AI_Snippet_SEO_Pro {
         global $pagenow;
         if($pagenow!=='edit.php' || !is_admin() || !$query->is_main_query()) return;
 
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display parameter, no state change.
         if(isset($_GET['aissp_filter'])){
-            $val=sanitize_text_field($_GET['aissp_filter']);
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display parameter, no state change.
+            $val=sanitize_text_field(wp_unslash($_GET['aissp_filter']));
             $mq=[];
             if($val==='haskw'){
                 $mq[]=['key'=>'_aissp_focus_keyword','compare'=>'EXISTS'];
@@ -672,10 +675,11 @@ final class AI_Snippet_SEO_Pro {
 
     // Notices (bulk success/fail)
     public function show_bulk_notices(){
+        // phpcs:disable WordPress.Security.NonceVerification.Recommended -- read-only display parameters, no state change.
 
         // If a job is running, show the live progress box
         if ( ! empty($_GET['aissp_job']) ) {
-            $jid = sanitize_text_field($_GET['aissp_job']);
+            $jid = sanitize_text_field(wp_unslash($_GET['aissp_job']));
             echo '<div id="aissp-bulk-box" class="notice notice-info is-dismissible" style="position:relative;">'
                 . '<p><strong>AI Snippet SEO Pro:</strong> Running bulk job… '
                 . '<span id="aissp-bulk-text">starting</span></p>'
@@ -700,8 +704,8 @@ final class AI_Snippet_SEO_Pro {
         }
 
         if (isset($_GET['aissp_bsuccess']) || isset($_GET['aissp_bfailed'])) {
-            $s = (int)($_GET['aissp_bsuccess'] ?? 0);
-            $f = (int)($_GET['aissp_bfailed'] ?? 0);
+            $s = intval(wp_unslash($_GET['aissp_bsuccess'] ?? 0));
+            $f = intval(wp_unslash($_GET['aissp_bfailed'] ?? 0));
 
             if ($s > 0) {
                 echo '<div class="notice notice-success is-dismissible"><p><strong>AI Snippet SEO Pro:</strong> Generated snippets for ' . intval($s) . ' item(s).</p></div>';
@@ -712,6 +716,7 @@ final class AI_Snippet_SEO_Pro {
                 echo '<div class="notice notice-error is-dismissible"><p><strong>AI Snippet SEO Pro:</strong> Failed for ' . intval($f) . ' item(s).</p></div>';
             }
         }
+        // phpcs:enable WordPress.Security.NonceVerification.Recommended
     }
 
     /**

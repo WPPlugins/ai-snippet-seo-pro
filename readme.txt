@@ -4,7 +4,7 @@ Tags: seo, meta-description, title, snippets, ai
 Requires at least: 5.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.0.33
+Stable tag: 1.0.34
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -130,6 +130,12 @@ Removing the plugin deletes its settings and only the score meta it created:
 
 == Changelog ==
 
+= 1.0.34 =
+* Hardening: if the trial API returns a structured error object instead of a string, the request no longer ends in a fatal error; the message is shown to you instead.
+* Fix: the plugin's admin script version no longer calls filemtime() on a file that may be missing.
+* Maintenance: the plugin now passes the official WordPress Plugin Check with zero errors. This covers output escaping in the meta box checklist, unslashing and sanitizing every request value, and prepared uninstall queries. Where a check does not apply, the exemption is documented inline with its reason rather than left silent.
+* Compatibility: verified on a real WordPress 7.1 install, including the post editor meta box, the term edit screens and the settings screen.
+
 = 1.0.33 =
 * SECURITY: the Pro Site Key is no longer printed into the admin page source. It was previously passed to the browser on every post, page, term and post-list screen, which exposed a paid API credential to any logged-in user who could open those screens, including Contributors.
 * SECURITY: removed a browser-side request to the RankPilotAI token endpoint that ran on every editor screen load. The response was never used, and the request sent the Site Key from the visitor's browser. Token status is still read on the settings screen, server side, exactly as the "External services" section describes.
@@ -202,6 +208,9 @@ Removing the plugin deletes its settings and only the score meta it created:
 * First public release.
 
 == Upgrade Notice ==
+
+= 1.0.34 =
+Maintenance release, verified against WordPress 7.1. Safe to update.
 
 = 1.0.33 =
 Security update. The Pro Site Key is no longer exposed in admin page source, and an unused browser-side request that carried it has been removed. Updating is strongly recommended.
