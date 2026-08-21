@@ -142,7 +142,7 @@ function aissp_call_rankpilot_api( $site_token, $payload ) {
     }
 
     $opts                = get_option( AISSP_SETTINGS_SLUG, [] );
-    $payload['domain']   = parse_url( home_url(), PHP_URL_HOST );
+    $payload['domain']   = wp_parse_url( home_url(), PHP_URL_HOST );
     $payload['site_url'] = home_url();
     $payload['plugin']   = 'ai-snippet-seo-pro';
     $payload['site_token'] = $site_token;
@@ -344,7 +344,7 @@ function aissp_call_rankpilot_api_bulk( string $site_token, array $items, string
 		'site_token'    => $site_token,
 		'plugin'        => 'ai-snippet-seo-pro',
 		'site_url'      => home_url(),
-		'domain'        => parse_url( home_url(), PHP_URL_HOST ),
+		'domain'        => wp_parse_url( home_url(), PHP_URL_HOST ),
 		'model'         => strtolower( $model_sel ?: 'gpt-4-turbo' ),
 		'custom_prompt' => $opts['custom_prompt'] ?? '',
 		'auto_slug'     => ( $opts['auto_slug'] ?? 'yes' ) === 'yes',

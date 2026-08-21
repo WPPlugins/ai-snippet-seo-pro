@@ -361,7 +361,7 @@ function aissp_render_settings_page() {
 				<div class="aissp-usage-grid">
 					<div class="aissp-usage-stat">
 						<span class="aissp-usage-label">Website</span>
-						<span class="aissp-usage-value"><?php echo esc_html( parse_url( home_url(), PHP_URL_HOST ) ); ?></span>
+						<span class="aissp-usage-value"><?php echo esc_html( wp_parse_url( home_url(), PHP_URL_HOST ) ); ?></span>
 					</div>
 					<div class="aissp-usage-stat">
 						<span class="aissp-usage-label">Used</span>

@@ -2,9 +2,9 @@
 Contributors: rankpilotai
 Tags: seo, meta-description, title, snippets, ai
 Requires at least: 5.8
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.0.32
+Stable tag: 1.0.33
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -130,6 +130,14 @@ Removing the plugin deletes its settings and only the score meta it created:
 
 == Changelog ==
 
+= 1.0.33 =
+* SECURITY: the Pro Site Key is no longer printed into the admin page source. It was previously passed to the browser on every post, page, term and post-list screen, which exposed a paid API credential to any logged-in user who could open those screens, including Contributors.
+* SECURITY: removed a browser-side request to the RankPilotAI token endpoint that ran on every editor screen load. The response was never used, and the request sent the Site Key from the visitor's browser. Token status is still read on the settings screen, server side, exactly as the "External services" section describes.
+* Fix: the plugin's focus-ring style is now scoped to the plugin's own meta box and settings screen. It previously applied to every text field and textarea in wp-admin with !important, overriding the focus style of the editor and of other plugins.
+* Fix: the admin script version no longer calls filemtime() on a missing file, matching the guard already used for the stylesheet.
+* Maintenance: added the missing "Plugin URI" header, switched to wp_parse_url() for consistency with the rest of the codebase.
+* Compatibility: tested with WordPress 7.1.
+
 = 1.0.32 =
 * SECURITY: TLS certificate verification is no longer disabled automatically. Previously, a failed certificate check triggered a silent retry with verification turned off, which could expose the request to a man-in-the-middle. Verification now stays on; site owners with a broken local CA bundle can opt in explicitly via the `aissp_http_allow_insecure_retry` filter.
 * Improvement: removed the hardcoded CA bundle path so custom and host-provided certificate stores are respected.
@@ -194,6 +202,9 @@ Removing the plugin deletes its settings and only the score meta it created:
 * First public release.
 
 == Upgrade Notice ==
+
+= 1.0.33 =
+Security update. The Pro Site Key is no longer exposed in admin page source, and an unused browser-side request that carried it has been removed. Updating is strongly recommended.
 
 = 1.0.32 =
 Security update. The plugin no longer falls back to an unverified TLS connection when a certificate check fails. Updating is recommended.

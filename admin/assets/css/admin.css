@@ -33,10 +33,15 @@
   line-height: 1.4;
 }
 
-/* Focus ring (accessibility) */
-input[type="text"]:focus,
-textarea:focus {
-  outline: 2px solid #229aff !important;
+/* Focus ring (accessibility) - scoped to this plugin's own UI */
+#aissp_meta_box input[type="text"]:focus,
+#aissp_meta_box textarea:focus,
+#aissp_meta_box_side input[type="text"]:focus,
+#aissp_meta_box_side textarea:focus,
+.aissp-settings-wrap input[type="text"]:focus,
+.aissp-settings-wrap textarea:focus {
+  outline: 2px solid #229aff;
+  outline-offset: -1px;
 }
 
 /* Score badge */

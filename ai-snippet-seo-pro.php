@@ -1,14 +1,15 @@
 <?php
 /*
 Plugin Name: AI Snippet SEO Pro
+Plugin URI:  https://rankpilotai.com/
 Description: Generate AI SEO titles and meta descriptions in one click, with scoring, live preview and bulk tools for posts and taxonomies.
-Version: 1.0.32
+Version: 1.0.33
 Author:      RankPilotAI
 Author URI:  https://rankpilotai.com
 Text Domain: ai-snippet-seo-pro
 Domain Path: /languages
 Requires at least: 5.8
-Tested up to:      7.0
+Tested up to:      7.1
 Requires PHP:      7.4
 License:           GPLv2 or later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
@@ -19,7 +20,7 @@ if ( ! defined('ABSPATH') ) exit;
 define('AISSP_FILE', __FILE__);
 define('AISSP_RP_API', 'https://rankpilotai.com/wp-json/rankpilotai/v1');
 
-if ( ! defined('AISSP_VERSION') ) { define('AISSP_VERSION','1.0.32'); }
+if ( ! defined('AISSP_VERSION') ) { define('AISSP_VERSION','1.0.33'); }
 function aissp_plugin_activate() {
     $option_key = 'aissp_settings';
     $opts = get_option($option_key, []);
@@ -54,7 +55,7 @@ final class AI_Snippet_SEO_Pro {
     }
 
     private function define_constants(){
-        if ( ! defined('AISSP_VERSION') ) define('AISSP_VERSION','1.0.32');
+        if ( ! defined('AISSP_VERSION') ) define('AISSP_VERSION','1.0.33');
         define('AISSP_PATH', plugin_dir_path(__FILE__));
         define('AISSP_URL', plugin_dir_url(__FILE__));
         define('AISSP_SETTINGS_SLUG','aissp_settings');
@@ -176,11 +177,12 @@ final class AI_Snippet_SEO_Pro {
             || in_array($hook, ['post.php','post-new.php','term.php','edit-tags.php','edit.php'], true)
             || strpos($hook, 'ai-snippet-seo-pro') !== false
         ) {
+            $js_file = AISSP_PATH . 'admin/assets/js/admin.js';
             wp_enqueue_script(
                 'aissp-admin-js',
                 AISSP_URL . 'admin/assets/js/admin.js',
                 ['jquery'],
-                filemtime(AISSP_PATH . 'admin/assets/js/admin.js'),
+                file_exists($js_file) ? filemtime($js_file) : AISSP_VERSION,
                 true
             );
 
@@ -191,7 +193,6 @@ final class AI_Snippet_SEO_Pro {
                 [
                     'ajaxurl'    => admin_url( 'admin-ajax.php' ),
                     'nonce'      => wp_create_nonce( 'aissp_ajax_nonce' ),
-                    'site_token' => $opts['site_token']   ?? '',
                     'rest_url'   => AISSP_RP_API,
                     'site_url'   => home_url(),
                     'model'      => $opts['model_choice'] ?? 'gpt-4-turbo',
