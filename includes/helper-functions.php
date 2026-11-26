@@ -5,7 +5,7 @@
  * @file      helper-functions.php
  * @package   RankPilotAI\AI_Snippet_SEO_Pro\Helpers
  * @since     1.0.0
- * @version   1.0.0
+ * @version   1.0.28
  * @license   GPL-2.0-or-later
  *
  * Provides:
@@ -25,6 +25,23 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 /* Add: mb_strlen polyfill (fallback only; defined once is enough) */
 if ( ! function_exists( 'mb_strlen' ) ) {
 	function mb_strlen( $s, $enc = '' ) { return strlen( $s ); }
+}
+
+/**
+ * Turn an API error value into a readable message.
+ * APIs may return a plain string or a structured object such as
+ * {"error":{"message":"..."}}; anything else falls back.
+ */
+function aissp_error_text( $value, string $fallback = '' ) : string {
+	if ( is_scalar( $value ) && '' !== (string) $value ) { return (string) $value; }
+	if ( is_array( $value ) ) {
+		foreach ( [ 'message', 'detail', 'error', 'msg' ] as $k ) {
+			if ( isset( $value[ $k ] ) && is_scalar( $value[ $k ] ) && '' !== (string) $value[ $k ] ) {
+				return (string) $value[ $k ];
+			}
+		}
+	}
+	return $fallback;
 }
 
 /* =========================================================
@@ -142,7 +159,7 @@ function aissp_call_rankpilot_api( $site_token, $payload ) {
     }
 
     $opts                = get_option( AISSP_SETTINGS_SLUG, [] );
-    $payload['domain']   = parse_url( home_url(), PHP_URL_HOST );
+    $payload['domain']   = wp_parse_url( home_url(), PHP_URL_HOST );
     $payload['site_url'] = home_url();
     $payload['plugin']   = 'ai-snippet-seo-pro';
     $payload['site_token'] = $site_token;
@@ -156,11 +173,13 @@ function aissp_call_rankpilot_api( $site_token, $payload ) {
 
     $res  = aissp_http_json( AISSP_RP_API . '/snippet', $payload, 'POST' );
     if ( is_wp_error( $res ) ) {
+        // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- delivered as JSON to admin.js and shown with alert(); never echoed as HTML.
         throw new Exception( 'API request error: ' . $res->get_error_message() );
     }
     $code = wp_remote_retrieve_response_code( $res );
     $body = wp_remote_retrieve_body( $res );
     if ( $code !== 200 ) {
+        // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- delivered as JSON to admin.js and shown with alert(); never echoed as HTML.
         throw new Exception( 'RankPilotAI API Error (HTTP ' . $code . '): ' . $body );
     }
     $json = json_decode( $body, true );
@@ -202,7 +221,7 @@ function aissp_check_token_status( $site_token ) {
         [ 'timeout' => 20, 'headers' => [ 'Cache-Control' => 'no-cache' ] ]
     );
 
-    // 1) WP_Error → gerçek mesajı geri döndür (debug için çok daha faydalı)
+    // 1) WP_Error -> return the real message (far more useful when debugging)
     if ( is_wp_error( $res ) ) {
         $msg = implode( '; ', $res->get_error_messages() );
         if ( ! $msg ) {
@@ -215,11 +234,11 @@ function aissp_check_token_status( $site_token ) {
     $body = wp_remote_retrieve_body( $res );
     $data = json_decode( $body, true );
 
-    // 2) HTTP 200 dışı status → mümkünse API'nin kendi error mesajını göster
+    // 2) Non-200 status -> surface the API's own error message when available
     if ( $code !== 200 ) {
         if ( is_array( $data ) && ! empty( $data['error'] ) ) {
             return [
-                'error'     => (string) $data['error'],
+                'error'     => aissp_error_text( $data['error'], 'HTTP ' . $code ),
                 'http_code' => $code,
             ];
         }
@@ -265,7 +284,8 @@ function aissp_reduce_rankpilot_token( $site_token, $model = 'gpt-4-turbo' ) {
 	$res = aissp_http_json( AISSP_RP_API . '/token-reduce', $body, 'POST', ['timeout'=>20] );
 if ( is_wp_error( $res ) ) { throw new Exception( 'RankPilotAI connection error.' ); }
 $data = json_decode( wp_remote_retrieve_body( $res ), true );
-if ( isset( $data['error'] ) ) { throw new Exception( $data['error'] ); }
+// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- delivered as JSON to admin.js and shown with alert(); never echoed as HTML.
+if ( isset( $data['error'] ) ) { throw new Exception( aissp_error_text( $data['error'], 'RankPilotAI request failed.' ) ); }
 return $data;
 }
 
@@ -344,7 +364,7 @@ function aissp_call_rankpilot_api_bulk( string $site_token, array $items, string
 		'site_token'    => $site_token,
 		'plugin'        => 'ai-snippet-seo-pro',
 		'site_url'      => home_url(),
-		'domain'        => parse_url( home_url(), PHP_URL_HOST ),
+		'domain'        => wp_parse_url( home_url(), PHP_URL_HOST ),
 		'model'         => strtolower( $model_sel ?: 'gpt-4-turbo' ),
 		'custom_prompt' => $opts['custom_prompt'] ?? '',
 		'auto_slug'     => ( $opts['auto_slug'] ?? 'yes' ) === 'yes',
@@ -467,4 +487,85 @@ function aissp_apply_snippet_result_for_term( int $term_id, array $data, array $
 		update_term_meta( $term_id, '_aissp_score', $sc['score'] );
 	}
 	return true;
+}
+
+/* =========================================================
+ *  MODE SYSTEM (Trial / BYOK / Pro)
+ * ======================================================= */
+
+function aissp_active_mode(): string {
+	$opt = get_option( AISSP_SETTINGS_SLUG, [] );
+	if ( ! empty( $opt['site_token'] ) )  return 'pro';
+	if ( ! empty( $opt['openai_key'] ) )  return 'byok';
+	if ( ! empty( $opt['trial_token'] ) ) return 'trial';
+	return 'none';
+}
+
+function aissp_call_openai_direct( string $api_key, array $context ): array {
+	$prompt = "You are an expert SEO consultant. Generate an SEO-optimized snippet for the following content.\n\n"
+		. "Content title: " . ( $context['post_title'] ?? $context['term_name'] ?? '' ) . "\n"
+		. "Content excerpt: " . ( $context['post_excerpt'] ?? $context['term_desc'] ?? '' ) . "\n"
+		. "Current slug: " . ( $context['slug'] ?? '' ) . "\n\n"
+		. "Return a JSON object with exactly these keys:\n"
+		. "- keyword: primary focus keyword (2-4 words)\n"
+		. "- title: SEO title (30-60 chars, must contain the keyword)\n"
+		. "- description: meta description (120-160 chars, must contain the keyword)\n"
+		. "- slug: URL-friendly slug (must contain the keyword)\n\n"
+		. "Return ONLY the JSON object, no markdown, no explanation.";
+
+	$body = [
+		'model'       => 'gpt-4.1-mini',
+		'messages'    => [ [ 'role' => 'user', 'content' => $prompt ] ],
+		'max_tokens'  => 300,
+		'temperature' => 0,
+	];
+
+	$res = wp_remote_post( 'https://api.openai.com/v1/chat/completions', [
+		'headers' => [
+			'Authorization' => 'Bearer ' . $api_key,
+			'Content-Type'  => 'application/json',
+		],
+		'body'    => wp_json_encode( $body ),
+		'timeout' => 30,
+	] );
+
+	if ( is_wp_error( $res ) ) return [ 'error' => $res->get_error_message() ];
+	$code = wp_remote_retrieve_response_code( $res );
+	if ( $code === 401 ) return [ 'error' => 'Invalid OpenAI API key' ];
+	if ( $code !== 200 ) return [ 'error' => 'OpenAI API error (HTTP ' . $code . ')' ];
+
+	$json = json_decode( wp_remote_retrieve_body( $res ), true );
+	$text = trim( $json['choices'][0]['message']['content'] ?? '' );
+	if ( strpos( $text, '```' ) !== false ) {
+		$text = trim( preg_replace( '/```(?:json)?\s*|```/', '', $text ) );
+	}
+	$parsed = json_decode( $text, true );
+	return is_array( $parsed ) ? $parsed : [ 'error' => 'Failed to parse OpenAI response' ];
+}
+
+function aissp_call_trial_api( array $context ): array {
+	$opts  = get_option( AISSP_SETTINGS_SLUG, [] );
+	$token = $opts['trial_token'] ?? '';
+	if ( ! $token ) return [ 'error' => 'No trial token' ];
+
+	$payload = array_merge( $context, [
+		'trial_token' => $token,
+		'domain'      => wp_parse_url( home_url(), PHP_URL_HOST ),
+		'site_url'    => home_url(),
+		'plugin'      => 'ai-snippet-seo-pro',
+	] );
+
+	$res = wp_remote_post( AISSP_RP_API . '/trial-snippet', [
+		'headers' => [ 'Content-Type' => 'application/json' ],
+		'body'    => wp_json_encode( $payload ),
+		'timeout' => 30,
+	] );
+
+	if ( is_wp_error( $res ) ) return [ 'error' => $res->get_error_message() ];
+	$code = wp_remote_retrieve_response_code( $res );
+	$body = json_decode( wp_remote_retrieve_body( $res ), true );
+	if ( $code !== 200 || ! is_array( $body ) ) {
+		return [ 'error' => isset( $body['error'] ) && is_scalar( $body['error'] ) ? (string) $body['error'] : 'Trial API error (HTTP ' . $code . ')' ];
+	}
+	return $body;
 }
