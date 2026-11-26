@@ -27,6 +27,23 @@ if ( ! function_exists( 'mb_strlen' ) ) {
 	function mb_strlen( $s, $enc = '' ) { return strlen( $s ); }
 }
 
+/**
+ * Turn an API error value into a readable message.
+ * APIs may return a plain string or a structured object such as
+ * {"error":{"message":"..."}}; anything else falls back.
+ */
+function aissp_error_text( $value, string $fallback = '' ) : string {
+	if ( is_scalar( $value ) && '' !== (string) $value ) { return (string) $value; }
+	if ( is_array( $value ) ) {
+		foreach ( [ 'message', 'detail', 'error', 'msg' ] as $k ) {
+			if ( isset( $value[ $k ] ) && is_scalar( $value[ $k ] ) && '' !== (string) $value[ $k ] ) {
+				return (string) $value[ $k ];
+			}
+		}
+	}
+	return $fallback;
+}
+
 /* =========================================================
  *  1)  SNIPPET SCORE CALCULATION
  * ======================================================= */
@@ -221,7 +238,7 @@ function aissp_check_token_status( $site_token ) {
     if ( $code !== 200 ) {
         if ( is_array( $data ) && ! empty( $data['error'] ) ) {
             return [
-                'error'     => (string) $data['error'],
+                'error'     => aissp_error_text( $data['error'], 'HTTP ' . $code ),
                 'http_code' => $code,
             ];
         }
@@ -268,7 +285,7 @@ function aissp_reduce_rankpilot_token( $site_token, $model = 'gpt-4-turbo' ) {
 if ( is_wp_error( $res ) ) { throw new Exception( 'RankPilotAI connection error.' ); }
 $data = json_decode( wp_remote_retrieve_body( $res ), true );
 // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- delivered as JSON to admin.js and shown with alert(); never echoed as HTML.
-if ( isset( $data['error'] ) ) { throw new Exception( $data['error'] ); }
+if ( isset( $data['error'] ) ) { throw new Exception( aissp_error_text( $data['error'], 'RankPilotAI request failed.' ) ); }
 return $data;
 }
 

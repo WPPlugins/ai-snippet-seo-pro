@@ -1,24 +1,26 @@
-=== AI Snippet SEO Pro ===
+=== AI Snippet SEO Pro – AI Meta Description & SEO Title Generator ===
 Contributors: rankpilotai
-Tags: seo, meta-description, title, snippets, ai
+Tags: meta description, seo title, ai seo, ai, seo
 Requires at least: 5.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.0.34
+Stable tag: 1.0.35
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-AI-powered SEO snippet generation for posts and taxonomies. Create optimized titles, meta descriptions, focus keywords and slugs in one click.
+AI SEO title and meta description generator for posts, pages, products and categories, with snippet score, live preview and bulk generation.
 
 == Description ==
 
-AI Snippet SEO Pro generates SEO-optimized titles, meta descriptions, focus keywords and slugs for posts, pages, custom post types and taxonomies.
+AI Snippet SEO Pro writes SEO titles, meta descriptions, focus keywords and slugs for posts, pages, WooCommerce products, custom post types and category or tag archives. It outputs the meta tags itself, so it works on its own without a separate SEO plugin.
+
+Writing a unique title and meta description for every page is the SEO task most sites skip. Without one, Google pulls a snippet from the page text, which rarely makes the best case for the click. Snippet SEO Pro writes a search-ready title and description from your content in seconds, scores it from 0 to 100, shows a live search preview, and can generate snippets for many posts or terms at once straight from the list screens (Pro).
 
 **Three ways to use:**
 
 1. **Free Trial** - Start instantly with 25 free tokens, no registration or API key needed.
 2. **Bring Your Own Key (BYOK)** - Use your own OpenAI API key for unlimited single generations at no cost.
-3. **Pro** - Upgrade for bulk generation, auto-slug, all AI models, custom prompts, index/noindex control, and priority support.
+3. **Pro** - Upgrade for bulk generation, auto-slug, all AI models, custom prompts, index/noindex control, and priority support. Plans start at $4.79/month, billed yearly. [See pricing](https://rankpilotai.com/ai-snippet-seo-pro-pricing/)
 
 **Highlights**
 
@@ -130,6 +132,11 @@ Removing the plugin deletes its settings and only the score meta it created:
 
 == Changelog ==
 
+= 1.0.35 =
+* Fix: if the RankPilotAI API returns a structured error object instead of a plain string, deducting tokens after a generation no longer ends in a server error, and other API errors no longer show "Array" or raise a PHP warning. The message inside the object is shown instead.
+* Maintenance: the official Plugin Check now reports zero errors and no naming warnings. The main class keeps its public name for backward compatibility, and the reason is documented inline. The last non-English code comment was translated.
+* Compatibility: verified on WordPress 7.1.3 with PHP 8.5, including the post editor meta box, the category list and term edit screens, and the settings screen, with no PHP notices or deprecations.
+
 = 1.0.34 =
 * Hardening: if the trial API returns a structured error object instead of a string, the request no longer ends in a fatal error; the message is shown to you instead.
 * Fix: the plugin's admin script version no longer calls filemtime() on a file that may be missing.
@@ -208,6 +215,9 @@ Removing the plugin deletes its settings and only the score meta it created:
 * First public release.
 
 == Upgrade Notice ==
+
+= 1.0.35 =
+Maintenance release, verified against WordPress 7.1.3 and PHP 8.5. Clearer error messages when the API reports a problem. Safe to update.
 
 = 1.0.34 =
 Maintenance release, verified against WordPress 7.1. Safe to update.

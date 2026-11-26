@@ -3,7 +3,7 @@
 Plugin Name: AI Snippet SEO Pro
 Plugin URI:  https://rankpilotai.com/
 Description: Generate AI SEO titles and meta descriptions in one click, with scoring, live preview and bulk tools for posts and taxonomies.
-Version: 1.0.34
+Version: 1.0.35
 Author:      RankPilotAI
 Author URI:  https://rankpilotai.com
 Text Domain: ai-snippet-seo-pro
@@ -20,7 +20,7 @@ if ( ! defined('ABSPATH') ) exit;
 define('AISSP_FILE', __FILE__);
 define('AISSP_RP_API', 'https://rankpilotai.com/wp-json/rankpilotai/v1');
 
-if ( ! defined('AISSP_VERSION') ) { define('AISSP_VERSION','1.0.34'); }
+if ( ! defined('AISSP_VERSION') ) { define('AISSP_VERSION','1.0.35'); }
 function aissp_plugin_activate() {
     $option_key = 'aissp_settings';
     $opts = get_option($option_key, []);
@@ -37,6 +37,7 @@ function aissp_plugin_activate() {
 }
 register_activation_hook(__FILE__,'aissp_plugin_activate');
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Public class name kept for backward compatibility; it is unique to this plugin and renaming it would break code that calls AI_Snippet_SEO_Pro::get_instance().
 final class AI_Snippet_SEO_Pro {
     protected static $instance = null;
     private $supported_taxonomies = ['category','post_tag','product_cat','product_tag'];
@@ -55,7 +56,7 @@ final class AI_Snippet_SEO_Pro {
     }
 
     private function define_constants(){
-        if ( ! defined('AISSP_VERSION') ) define('AISSP_VERSION','1.0.34');
+        if ( ! defined('AISSP_VERSION') ) define('AISSP_VERSION','1.0.35');
         define('AISSP_PATH', plugin_dir_path(__FILE__));
         define('AISSP_URL', plugin_dir_url(__FILE__));
         define('AISSP_SETTINGS_SLUG','aissp_settings');
@@ -123,7 +124,7 @@ final class AI_Snippet_SEO_Pro {
             'manage_options',                              // Capability
             'ai-snippet-seo-pro',                          // Menu slug
             [$this,'render_settings_page'],                // Callback
-            plugin_dir_url(__FILE__) . 'admin/assets/img/ai-snippet-seo-pro.svg', // icon_url (SVG yolu)
+            plugin_dir_url(__FILE__) . 'admin/assets/img/ai-snippet-seo-pro.svg', // Icon URL (SVG path)
             25                                             // Position
         );
     }
